@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeToolbox</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tools-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            justify-content: center; /* Center the cards in the row */
+        }
+    
+        .tool-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: fit-content;
+            min-height: 80px;
+        }
+
+        .tool-card .tool-header {
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tool-content {
+            display: none;
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        textarea {
+            width: calc(100% - 22px);
+            min-height: 120px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 14px;
+            min-width: 100px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        .tool-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .expand-icon {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .tool-description {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+        
+        #countResults {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>LeToolbox</h1>
+        <p>Select a tool to begin</p>
+    </div>
+    
+    <div class="tools-container">
+        <!-- Text Formatter Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Text Formatter</h3>
+                    <p class="tool-description">Wraps text in quotes and ends with a coma (if more than 1)</p>
+                    <p class="tool-description">EX: example@website.com -> "example@website.com"</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="textInput" placeholder="Paste text separated by spaces, new lines, or commas"></textarea>
+                <div class="button-group">
+                    <button onclick="formatText()">Format</button>
+                    <button class="copy-btn" onclick="copyText('textOutput')">Copy Result</button>
+                </div>
+                <textarea id="textOutput" readonly placeholder="Formatted result will appear here"></textarea>
+            </div>
+        </div>
+
+        <!-- Defang/Refang Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Defang and Fang</h3>
+                    <p class="tool-description">Defang or refang URLs, IPs, and Emails</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="fangInput" placeholder="Enter URLs or IPs (one per line)&#10;Example URL: https://example.com, hxxp://example[.]com&#10;Example IP: 192.168.1.1, 192[.]168[.]1[.]1&#10;Example Email: email@email.com, email[@]email[.]com"></textarea>
+                <div class="button-group">
+                    <button onclick="defang()">Defang</button>
+                    <button onclick="refang()">Refang</button>
+                    <button class="copy-btn" onclick="copyText('fangOutput')">Copy Result</button>
+                </div>
+                <textarea id="fangOutput" readonly placeholder="Processed result will appear here"></textarea>
+            </div>
+        </div>
+
+        <!-- VirusTotal and AbuseIPDB Search Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Threat Intelligence Search</h3>
+                    <p class="tool-description">Search IPs/Domains on VirusTotal and AbuseIPDB</p>
+                    <p class="tool-description">Open buttons <b>ONLY</b> work <b>ONE</b> IP at a time</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="threatInput" placeholder="Enter IPs or domains (one per line)"></textarea>
+                <div class="button-group">
+                    <button onclick="searchThreatIntel()">Generate URLs</button>
+                    <button onclick="openVirusTotal()">Open VT</button>
+                    <button onclick="openAbuseIPDB()">Open AbuseIPDB</button>
+                    <button class="copy-btn" onclick="copyText('threatOutput')">Copy Result</button>
+                </div>
+                <textarea id="threatOutput" readonly placeholder="Generated search URLs will appear here"></textarea>
+            </div>
+        </div>
+
+        <!-- Safelink Decoder Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Safelink Decoder</h3>
+                    <p class="tool-description">Decode Safelink and other obfuscated URLs</p>
+                    <p class="tool-description">EX: https://nam02.safelinks.protection.outlook.com/?url=... -> Actual decoded URL</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="safelinkInput" placeholder="Paste Safelink URLs here"></textarea>
+                <div class="button-group">
+                    <button onclick="decodeSafelinks()">Decode</button>
+                    <button class="copy-btn" onclick="copyText('safelinkOutput')">Copy Result</button>
+                </div>
+                <textarea id="safelinkOutput" readonly placeholder="Decoded URL will appear here"></textarea>
+            </div>
+        </div>
+
+        <!-- Text Case Converter -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Case Converter</h3>
+                    <p class="tool-description">Convert text case (UPPER/lower/Title Case)</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <textarea id="caseInput" placeholder="Enter text to convert case"></textarea>
+                <div class="button-group">
+                    <button onclick="convertCase('upper')">UPPERCASE</button>
+                    <button onclick="convertCase('lower')">lowercase</button>
+                    <button onclick="convertCase('title')">Title Case</button>
+                    <button class="copy-btn" onclick="copyText('caseOutput')">Copy Result</button>
+                </div>
+                <textarea id="caseOutput" readonly placeholder="Converted text will appear here"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('.tool-header').click(function(e) {
+            $('.tool-card').not($(this).parent()).removeClass('expanded')
+                .find('.tool-content').slideUp();
+            
+            const toolCard = $(this).parent();
+            const toolContent = $(this).next('.tool-content');
+            
+            toolCard.toggleClass('expanded');
+            toolContent.slideToggle();
+        });
+
+        function formatText() {
+            const input = document.getElementById('textInput').value;
+            const text = input.split(/[\s,]+/).filter(text => text.trim());
+            const formatted = text.map(text => `"${text.trim()}"`).join(', ');
+            document.getElementById('textOutput').value = formatted;
+        }
+
+        // New defang/refang functions
+        function defang() {
+            const input = document.getElementById('fangInput').value;
+            let output = input
+                // Replace http with hxxp
+                .replace(/http/gi, 'hxxp')
+                // Replace dots in URLs/IPs with [.]
+                .replace(/\./g, '[.]')
+                // Replace @ in URLs with [@]
+                .replace(/@/g, '[@]')
+                // Replace : with [:]
+                .replace(/:/g, '[:]');
+            
+            document.getElementById('fangOutput').value = output;
+        }
+
+        function refang() {
+            const input = document.getElementById('fangInput').value;
+            let output = input
+                // Replace hxxp with http
+                .replace(/hxxp/gi, 'http')
+                // Remove brackets around dots
+                .replace(/\[\.\]/g, '.')
+                // Remove brackets around @
+                .replace(/\[@\]/g, '@')
+                // Remove brackets around colons
+                .replace(/\[:\]/g, ':');
+            
+            document.getElementById('fangOutput').value = output;
+        }
+
+        function convertCase(type) {
+            const input = document.getElementById('caseInput').value;
+            let result = input;
+            
+            switch(type) {
+                case 'upper':
+                    result = input.toUpperCase();
+                    break;
+                case 'lower':
+                    result = input.toLowerCase();
+                    break;
+                case 'title':
+                    result = input.toLowerCase().split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    break;
+            }
+            
+            document.getElementById('caseOutput').value = result;
+        }
+
+        function copyText(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 1000);
+        }
+
+        function openVirusTotal() {
+            const input = document.getElementById("threatInput").value;
+            const items = input.split(/\r?\n/).filter((item) => item.trim());
+
+            if (items.length === 0) {
+                alert("Please enter at least one IP or domain.");
+                return;
+            }
+
+            const url = `https://www.virustotal.com/gui/search/${encodeURIComponent(items[0])}`;
+            window.open(url, "_blank");
+        }
+
+        function openAbuseIPDB() {
+            const input = document.getElementById("threatInput").value;
+            const items = input.split(/\r?\n/).filter((item) => item.trim());
+
+            if (items.length === 0) {
+                alert("Please enter at least one IP or domain.");
+                return;
+            }
+
+            const url = `https://www.abuseipdb.com/check/${encodeURIComponent(items[0])}`;
+            window.open(url, "_blank");
+        }
+
+        function searchThreatIntel() {
+            const input = document.getElementById('threatInput').value;
+            const items = input.split(/\r?\n/).filter(item => item.trim());
+            let output = '';
+
+            items.forEach(item => {
+                const trimmedItem = item.trim();
+                if (trimmedItem) {
+                    output += `https://www.virustotal.com/gui/search/${encodeURIComponent(trimmedItem)}\n`;
+                    output += `https://www.abuseipdb.com/check/${encodeURIComponent(trimmedItem)}\n\n`;
+                }
+            });
+
+            document.getElementById('threatOutput').value = output.trim();
+        }
+
+        function decodeSafelinks() {
+            const input = document.getElementById("safelinkInput").value;
+            let decodedOutput = input;
+
+            // Regular expression to extract the 'url' parameter from the Safelink
+            const safelinkRegex = /url=([^&]+)/i;
+
+            const match = safelinkRegex.exec(input);
+            if (match && match[1]) {
+                let encodedUrl = match[1];
+
+                // First, attempt to decode the URL-encoded string (e.g., '%20' -> space)
+                let decodedUrl = decodeURIComponent(encodedUrl);
+
+                // If the URL looks like a base64 string (check if it starts with 'http' after decoding), try base64 decoding
+                if (decodedUrl && decodedUrl.indexOf('http') === 0) {
+                    decodedOutput = decodedUrl;
+                } else {
+                    // Otherwise, fallback to base64 decoding (in case base64 encoding is used within the Safelink URL)
+                    try {
+                        decodedUrl = atob(encodedUrl); // Decode base64
+                        decodedOutput = decodeURIComponent(decodedUrl); // If it's still URL-encoded, decode that too
+                    } catch (e) {
+                        decodedOutput = "Error: Unable to decode Safelink URL.";
+                    }
+                }
+            } else {
+                decodedOutput = "Error: No 'url' parameter found in the Safelink.";
+            }
+
+            // Display the decoded result
+            document.getElementById("safelinkOutput").value = decodedOutput;
+        }
+    </script>
+<footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
+    <p>Code generated by prompting Claude/ChatGPT with slight modifications by me.</p>
+</footer>
+</body>
+</html>
