@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeToolbox</title>
+    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=32&id=RfJKxyoGSJkO&format=png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -219,6 +221,34 @@
             </div>
         </div>
 
+        <!-- QR Decoder Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>QR Decoder</h3>
+                    <p class="tool-description">Decode QR codes from an uploaded image or a visible image on your screen.</p>
+                </div>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="tool-content">
+                <!-- Image Upload Section -->
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
+                    <label for="qrFileInput" style="font-weight: bold; display: block; margin-bottom: 5px;">Upload an Image:</label>
+                    <input type="file" id="qrFileInput" accept="image/*" style="margin-bottom: 10px;" />
+                    <button onclick="decodeQRFromFile()" style="margin-right: 10px;">Decode Uploaded Image</button>
+                </div>
+                 <!-- URL Input Section -->
+                 <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f1f8ff;">
+                    <label for="qrImageUrl" style="font-weight: bold; display: block; margin-bottom: 5px;">Paste an Image URL:</label>
+                    <input type="text" id="qrImageUrl" placeholder="Paste an image URL" style="width: calc(100% - 22px); margin-bottom: 10px;" />
+                    <button onclick="decodeQRFromUrl()" style="margin-right: 10px;">Decode from URL</button>
+                </div>
+                <textarea id="qrDecodedOutput" readonly placeholder="Decoded text will appear here"></textarea>
+                <button onclick="resetQRDecoder()">Reset</button>
+                <button class="copy-btn" onclick="copyText('qrDecodedOutput')">Copy Result</button>
+            </div>
+        </div>
+
         <!-- Text Case Converter -->
         <div class="tool-card">
             <div class="tool-header">
@@ -400,6 +430,65 @@
             // Display the decoded result
             document.getElementById("safelinkOutput").value = decodedOutput;
         }
+
+        //QR Decode from File
+        async function decodeQRFromFile() {
+            const fileInput = document.getElementById('qrFileInput');
+            const output = document.getElementById('qrDecodedOutput');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select an image file.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+
+            img.onload = () => processQRImage(img, output);
+        }
+
+        //QR Decode from URL
+        async function decodeQRFromUrl() {
+            const imageUrl = document.getElementById('qrImageUrl').value.trim();
+            const output = document.getElementById('qrDecodedOutput');
+
+            if (!imageUrl) {
+                alert("Please enter a valid image URL.");
+                return;
+            }
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous"; // Ensure CORS handling for external images
+            img.src = imageUrl;
+
+            img.onload = () => processQRImage(img, output);
+        }
+
+        function processQRImage(img, outputElement) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0, img.width, img.height);
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
+
+            if (qrCode) {
+                outputElement.value = qrCode.data;
+            } else {
+                outputElement.value = "No QR code detected.";
+            }
+        }
+        
+        function resetQRDecoder() {
+            document.getElementById('qrFileInput').value = ""; // Clear the file input
+            document.getElementById('qrImageUrl').value = "";  // Clear the URL input
+            document.getElementById('qrDecodedOutput').value = ""; // Clear the decoded output
+        }
+
     </script>
 <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
     <p>Code generated by prompting Claude/ChatGPT with slight modifications by me.</p>
