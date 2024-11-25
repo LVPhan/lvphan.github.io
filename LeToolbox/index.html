@@ -8,11 +8,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr"></script>
     <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #000;
+            --card-bg: white;
+            --card-shadow: rgba(0,0,0,0.1);
+            --card-hover-shadow: rgba(0,0,0,0.2);
+            --border-color: #ddd;
+            --description-color: #666;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #fff;
+            --card-bg: #2d2d2d;
+            --card-shadow: rgba(0,0,0,0.3);
+            --card-hover-shadow: rgba(0,0,0,0.4);
+            --border-color: #404040;
+            --description-color: #aaa;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background: #f0f2f5;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .header {
@@ -26,29 +48,25 @@
             gap: 20px;
             max-width: 1400px;
             margin: 0 auto;
-            justify-content: center; /* Center the cards in the row */
+            justify-content: center;
         }
     
         .tool-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
             transition: all 0.3s ease;
             height: fit-content;
             min-height: 80px;
         }
 
-        .tool-card .tool-header {
-            cursor: pointer;
-        }
-        
         .tool-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px var(--card-hover-shadow);
         }
         
         .tool-content {
-            display: none;
+            display: block;
             margin-top: 15px;
             width: 100%;
         }
@@ -58,12 +76,14 @@
             min-height: 120px;
             margin: 10px 0;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             resize: vertical;
             font-family: inherit;
             font-size: 14px;
             line-height: 1.5;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
         
         .button-group {
@@ -101,6 +121,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0;
+            cursor: pointer;
         }
         
         .tool-header h3 {
@@ -111,24 +132,81 @@
         .expand-icon {
             font-size: 18px;
             transition: transform 0.3s ease;
-        }
-        
-        .expanded .expand-icon {
             transform: rotate(180deg);
         }
         
         .tool-description {
-            color: #666;
+            color: var(--description-color);
             font-size: 14px;
             margin: 5px 0 0 0;
         }
+
+        /* Toggle Switches Container */
+        .toggles-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
         
-        #countResults {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            font-size: 14px;
+        /* Toggle Switch Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 10px;
+            margin-bottom: 5px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-label {
+            font-size: 16px;
+            color: var(--text-color);
         }
     </style>
 </head>
@@ -136,6 +214,25 @@
     <div class="header">
         <h1>LeToolbox</h1>
         <p>Select a tool to begin</p>
+        <!-- Collapse Toggle -->
+        <div class="toggle-container">
+            <span class="toggle-label">Collapse All</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleAll" checked>
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Expand All</span>
+        </div>
+
+         <!-- Dark Mode Toggle -->
+         <div class="toggle-container">
+            <span class="toggle-label">Light Mode</span>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Dark Mode</span>
+        </div>
     </div>
     
     <div class="tools-container">
@@ -231,16 +328,24 @@
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <!-- Image Upload Section -->
-                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-                    <label for="qrFileInput" style="font-weight: bold; display: block; margin-bottom: 5px;">Upload an Image:</label>
-                    <input type="file" id="qrFileInput" accept="image/*" style="margin-bottom: 10px;" />
+                 <!-- Image Upload Section - Updated styles -->
+                 <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
+                    <label for="qrFileInput" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Upload an Image:</label>
+                    <input type="file" id="qrFileInput" accept="image/*" style="margin-bottom: 10px; color: var(--text-color);" />
                     <button onclick="decodeQRFromFile()" style="margin-right: 10px;">Decode Uploaded Image</button>
                 </div>
-                 <!-- URL Input Section -->
-                 <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f1f8ff;">
-                    <label for="qrImageUrl" style="font-weight: bold; display: block; margin-bottom: 5px;">Paste an Image URL:</label>
-                    <input type="text" id="qrImageUrl" placeholder="Paste an image URL" style="width: calc(100% - 22px); margin-bottom: 10px;" />
+                <!-- URL Input Section - Updated styles -->
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
+                    <label for="qrImageUrl" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Paste an Image URL:</label>
+                    <input type="text" id="qrImageUrl" placeholder="Paste an image URL" 
+                           style="width: calc(100% - 22px); 
+                                  margin-bottom: 10px; 
+                                  padding: 8px; 
+                                  border: 1px solid var(--border-color); 
+                                  border-radius: 4px; 
+                                  background-color: var(--card-bg); 
+                                  color: var(--text-color);
+                                  transition: background-color 0.3s ease, border-color 0.3s ease;" />
                     <button onclick="decodeQRFromUrl()" style="margin-right: 10px;">Decode from URL</button>
                 </div>
                 <textarea id="qrDecodedOutput" readonly placeholder="Decoded text will appear here"></textarea>
@@ -272,15 +377,60 @@
     </div>
 
     <script>
-        $('.tool-header').click(function(e) {
-            $('.tool-card').not($(this).parent()).removeClass('expanded')
-                .find('.tool-content').slideUp();
+        // Initialize all cards as expanded
+        $(document).ready(function() {
+            $('.tool-card').addClass('expanded');
+            $('.tool-content').show();
             
+            // Initialize dark mode based on user preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                $('#darkModeToggle').prop('checked', true);
+            }
+        });
+
+        // Card Toggle Functionality
+        $('.tool-header').click(function(e) {
             const toolCard = $(this).parent();
             const toolContent = $(this).next('.tool-content');
+            const expandIcon = $(this).find('.expand-icon');
             
             toolCard.toggleClass('expanded');
             toolContent.slideToggle();
+            
+            if (toolCard.hasClass('expanded')) {
+                expandIcon.css('transform', 'rotate(180deg)');
+            } else {
+                expandIcon.css('transform', 'rotate(0deg)');
+            }
+        });
+
+        // Expand/Collapse Toggle Functionality
+        $('#toggleAll').change(function() {
+            const isChecked = $(this).prop('checked');
+            const allToolCards = $('.tool-card');
+            const allExpandIcons = $('.expand-icon');
+            
+            if (isChecked) {
+                allToolCards.addClass('expanded');
+                $('.tool-content').slideDown();
+                allExpandIcons.css('transform', 'rotate(180deg)');
+            } else {
+                allToolCards.removeClass('expanded');
+                $('.tool-content').slideUp();
+                allExpandIcons.css('transform', 'rotate(0deg)');
+            }
+        });
+
+        // Dark Mode Toggle Functionality
+        $('#darkModeToggle').change(function() {
+            if ($(this).is(':checked')) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('darkMode', 'false');
+            }
         });
 
         function formatText() {
@@ -488,10 +638,10 @@
             document.getElementById('qrImageUrl').value = "";  // Clear the URL input
             document.getElementById('qrDecodedOutput').value = ""; // Clear the decoded output
         }
-
     </script>
 <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
     <p>Code generated by prompting Claude/ChatGPT with slight modifications by me.</p>
+    <p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="">Report a bug</a> 🐛</p>
 </footer>
 </body>
 </html>
