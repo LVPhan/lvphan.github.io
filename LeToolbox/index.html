@@ -284,7 +284,7 @@
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="textInput" placeholder="Paste text separated by spaces, new lines, or commas"></textarea>
+                <textarea id="textInput" placeholder="Paste text separated by commas or new lines"></textarea>
                 <div class="button-group">
                     <button onclick="formatText()">Format</button>
                     <button class="copy-btn" onclick="copyText('textOutput')">Copy Result</button>
@@ -303,7 +303,7 @@
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="fangInput" placeholder="Enter URLs or IPs (one per line)&#10;Example URL: https://example.com, hxxp://example[.]com&#10;Example IP: 192.168.1.1, 192[.]168[.]1[.]1&#10;Example Email: email@email.com, email[@]email[.]com"></textarea>
+                <textarea id="fangInput" placeholder="Enter URLs, IPs, or Emails&#10;Example URL: https://example.com, hxxp://example[.]com&#10;Example IP: 192.168.1.1, 192[.]168[.]1[.]1&#10;Example Email: email@email.com, email[@]email[.]com"></textarea>
                 <div class="button-group">
                     <button onclick="defang()">Defang</button>
                     <button onclick="refang()">Refang</button>
@@ -494,7 +494,9 @@
 
         function formatText() {
             const input = document.getElementById('textInput').value;
-            const text = input.split(/[\s,]+/).filter(text => text.trim());
+            // Split the text only by commas or new lines
+            const text = input.split(/[\n,]+/).filter(text => text.trim());
+            // Join back the words, wrapping each in quotes and joining with a comma
             const formatted = text.map(text => `"${text.trim()}"`).join(', ');
             document.getElementById('textOutput').value = formatted;
         }
