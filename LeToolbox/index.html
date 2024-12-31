@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeToolbox 🧰</title>
-    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=32&id=RfJKxyoGSJkO&format=png">
+    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=92oZwSFODREJ&format=png&color=000000">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr"></script>
     <style>
@@ -279,17 +279,16 @@
                 <div>
                     <h3>Text Formatter</h3>
                     <p class="tool-description">Wraps text in quotes and ends with a coma (if more than 1)</p>
-                    <p class="tool-description">EX: example@website.com -> "example@website.com"</p>
                 </div>
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="textInput" placeholder="Paste text separated by commas or new lines"></textarea>
+                <textarea id="textInput" placeholder="Enter text separated by commas or new lines"></textarea>
                 <div class="button-group">
                     <button onclick="formatText()">Format</button>
                     <button class="copy-btn" onclick="copyText('textOutput')">Copy Result</button>
                 </div>
-                <textarea id="textOutput" readonly placeholder="Formatted result will appear here"></textarea>
+                <textarea id="textOutput" readonly placeholder="Formatted result(s) will appear here"></textarea>
             </div>
         </div>
 
@@ -298,18 +297,18 @@
             <div class="tool-header">
                 <div>
                     <h3>Defang and Fang</h3>
-                    <p class="tool-description">Defang or refang URLs, IPs, and Emails</p>
+                    <p class="tool-description">Defang or refang URL(s), IP(s), and Email(s)</p>
                 </div>
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="fangInput" placeholder="Enter URLs, IPs, or Emails&#10;Example URL: https://example.com, hxxp://example[.]com&#10;Example IP: 192.168.1.1, 192[.]168[.]1[.]1&#10;Example Email: email@email.com, email[@]email[.]com"></textarea>
+                <textarea id="fangInput" placeholder="Enter URL(s), IP(s), or Email(s) seperated by commas or new lines"></textarea>
                 <div class="button-group">
                     <button onclick="defang()">Defang</button>
                     <button onclick="refang()">Refang</button>
                     <button class="copy-btn" onclick="copyText('fangOutput')">Copy Result</button>
                 </div>
-                <textarea id="fangOutput" readonly placeholder="Processed result will appear here"></textarea>
+                <textarea id="fangOutput" readonly placeholder="Defanged or refanged result(s) will appear here"></textarea>
             </div>
         </div>
 
@@ -324,14 +323,14 @@
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="threatInput" placeholder="Enter IPs or domains (one per line)"></textarea>
+                <textarea id="threatInput" placeholder="Enter IP(s) or domain(s) (one per line)"></textarea>
                 <div class="button-group">
                     <button onclick="searchThreatIntel()">Generate URLs</button>
                     <button onclick="openVirusTotal()">Open VT</button>
                     <button onclick="openAbuseIPDB()">Open AbuseIPDB</button>
                     <button class="copy-btn" onclick="copyText('threatOutput')">Copy Result</button>
                 </div>
-                <textarea id="threatOutput" readonly placeholder="Generated search URLs will appear here"></textarea>
+                <textarea id="threatOutput" readonly placeholder="Generated search URL(s) will appear here"></textarea>
             </div>
         </div>
 
@@ -341,17 +340,17 @@
                 <div>
                     <h3>Safelink Decoder</h3>
                     <p class="tool-description">Decode Safelink and other obfuscated URLs</p>
-                    <p class="tool-description">EX: https://nam02.safelinks.protection.outlook.com/?url=... -> Actual decoded URL</p>
+                    <p class="tool-description">EX: https://nam02.safelinks.protection.outlook.com/?url=...</p>
                 </div>
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="safelinkInput" placeholder="Paste Safelink URLs here"></textarea>
+                <textarea id="safelinkInput" placeholder="Enter Safelink URL(s) seperated by commas or new lines"></textarea>
                 <div class="button-group">
                     <button onclick="decodeSafelinks()">Decode</button>
                     <button class="copy-btn" onclick="copyText('safelinkOutput')">Copy Result</button>
                 </div>
-                <textarea id="safelinkOutput" readonly placeholder="Decoded URL will appear here"></textarea>
+                <textarea id="safelinkOutput" readonly placeholder="Decoded URL(s) will appear here"></textarea>
             </div>
         </div>
 
@@ -360,7 +359,7 @@
             <div class="tool-header">
                 <div>
                     <h3>QR Decoder</h3>
-                    <p class="tool-description">Decode QR codes from an uploaded image or a visible image on your screen.</p>
+                    <p class="tool-description">Decode QR codes from an uploaded image or an image URL.</p>
                 </div>
                 <span class="expand-icon">▼</span>
             </div>
@@ -385,30 +384,29 @@
                                   transition: background-color 0.3s ease, border-color 0.3s ease;" />
                     <button onclick="decodeQRFromUrl()" style="margin-right: 10px;">Decode from URL</button>
                 </div>
-                <textarea id="qrDecodedOutput" readonly placeholder="Decoded text will appear here"></textarea>
+                <textarea id="qrDecodedOutput" readonly placeholder="Decoded URL will appear here"></textarea>
                 <button onclick="resetQRDecoder()">Reset</button>
                 <button class="copy-btn" onclick="copyText('qrDecodedOutput')">Copy Result</button>
             </div>
         </div>
-
-        <!-- Text Case Converter -->
+        
+        <!-- WHOIS Search Tool -->
         <div class="tool-card">
             <div class="tool-header">
                 <div>
-                    <h3>Case Converter</h3>
-                    <p class="tool-description">Convert text case (UPPER/lower/Title Case)</p>
+                    <h3>WHOIS Search</h3>
+                    <p class="tool-description">Search URL or IP on WHOIS</p>
                 </div>
                 <span class="expand-icon">▼</span>
             </div>
             <div class="tool-content">
-                <textarea id="caseInput" placeholder="Enter text to convert case"></textarea>
+                <textarea id="whoisInput" placeholder="Enter IP or domain"></textarea>
                 <div class="button-group">
-                    <button onclick="convertCase('upper')">UPPERCASE</button>
-                    <button onclick="convertCase('lower')">lowercase</button>
-                    <button onclick="convertCase('title')">Title Case</button>
-                    <button class="copy-btn" onclick="copyText('caseOutput')">Copy Result</button>
+                    <button onclick="generateWhoisURL()">Generate URL</button>
+                    <button onclick="openWhois()">Open WHOIS</button>
+                    <button class="copy-btn" onclick="copyText('whoisOutput')">Copy Result</button>
                 </div>
-                <textarea id="caseOutput" readonly placeholder="Converted text will appear here"></textarea>
+                <textarea id="whoisOutput" readonly placeholder="Generated whois URL will appear here"></textarea>
             </div>
         </div>
     </div>
@@ -532,27 +530,6 @@
             document.getElementById('fangOutput').value = output;
         }
 
-        function convertCase(type) {
-            const input = document.getElementById('caseInput').value;
-            let result = input;
-            
-            switch(type) {
-                case 'upper':
-                    result = input.toUpperCase();
-                    break;
-                case 'lower':
-                    result = input.toLowerCase();
-                    break;
-                case 'title':
-                    result = input.toLowerCase().split(' ')
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ');
-                    break;
-            }
-            
-            document.getElementById('caseOutput').value = result;
-        }
-
         function copyText(elementId) {
             const element = document.getElementById(elementId);
             element.select();
@@ -610,36 +587,58 @@
 
         function decodeSafelinks() {
             const input = document.getElementById("safelinkInput").value;
-            let decodedOutput = input;
+            let decodedOutput = [];
 
-            // Regular expression to extract the 'url' parameter from the Safelink
-            const safelinkRegex = /url=([^&]+)/i;
+            // Split input by new lines or commas, trim any leading/trailing spaces
+            const safelinks = input.split(/[\n,]+/).map(item => item.trim()).filter(item => item.length > 0);
 
-            const match = safelinkRegex.exec(input);
-            if (match && match[1]) {
-                let encodedUrl = match[1];
-
-                // First, attempt to decode the URL-encoded string (e.g., '%20' -> space)
-                let decodedUrl = decodeURIComponent(encodedUrl);
-
-                // If the URL looks like a base64 string (check if it starts with 'http' after decoding), try base64 decoding
-                if (decodedUrl && decodedUrl.indexOf('http') === 0) {
-                    decodedOutput = decodedUrl;
-                } else {
-                    // Otherwise, fallback to base64 decoding (in case base64 encoding is used within the Safelink URL)
-                    try {
-                        decodedUrl = atob(encodedUrl); // Decode base64
-                        decodedOutput = decodeURIComponent(decodedUrl); // If it's still URL-encoded, decode that too
-                    } catch (e) {
-                        decodedOutput = "Error: Unable to decode Safelink URL.";
-                    }
-                }
+            if (safelinks.length === 0) {
+                decodedOutput = ["Error: No Safelinks to decode."];
             } else {
-                decodedOutput = "Error: No 'url' parameter found in the Safelink.";
+                safelinks.forEach(safelink => {
+                    // Regular expression to extract the 'url' parameter from the Safelink
+                    const safelinkRegex = /url=([^&]+)/i;
+                    const match = safelinkRegex.exec(safelink);
+
+                    if (match && match[1]) {
+                        let encodedUrl = match[1];
+                        let decodedUrl = encodedUrl;
+
+                        // First, attempt to decode the URL-encoded string (e.g., '%20' -> space)
+                        try {
+                            decodedUrl = decodeURIComponent(encodedUrl);
+
+                            // If the URL looks like it starts with 'http', it's decoded
+                            if (decodedUrl && decodedUrl.indexOf('http') === 0) {
+                                decodedOutput.push(decodedUrl);
+                            } else {
+                                // Otherwise, fallback to base64 decoding (if needed)
+                                try {
+                                    decodedUrl = atob(encodedUrl); // Decode base64
+                                    decodedUrl = decodeURIComponent(decodedUrl); // Decode any further URL encoding if present
+                                    decodedOutput.push(decodedUrl);
+                                } catch (e) {
+                                    decodedOutput.push("Error: Unable to decode Safelink URL.");
+                                }
+                            }
+                        } catch (e) {
+                            decodedOutput.push("Error: Unable to decode URL-encoded string.");
+                        }
+                    } else {
+                        decodedOutput.push("Error: No 'url' parameter found in the Safelink.");
+                    }
+                });
             }
 
-            // Display the decoded result
-            document.getElementById("safelinkOutput").value = decodedOutput;
+            // Get the format of the input: check if it's separated by commas or new lines
+            const delimiter = input.includes(',') ? ',' : '\n';
+
+            // If delimiter is comma, add a space after each comma in the output
+            if (delimiter === ',') {
+                document.getElementById("safelinkOutput").value = decodedOutput.join(', ');
+            } else {
+                document.getElementById("safelinkOutput").value = decodedOutput.join('\n');
+            }
         }
 
         //QR Decode from File
@@ -698,6 +697,23 @@
             document.getElementById('qrFileInput').value = ""; // Clear the file input
             document.getElementById('qrImageUrl').value = "";  // Clear the URL input
             document.getElementById('qrDecodedOutput').value = ""; // Clear the decoded output
+        }
+
+        // WHOIS
+        function openWhois() {
+            const input = document.getElementById("whoisInput").value;
+            const url = `https://www.whois.com/whois/${encodeURIComponent(input)}`;
+            window.open(url, "_blank");
+        }
+
+        function generateWhoisURL() {
+            const input = document.getElementById('whoisInput').value;
+            const items = input.split(/\r?\n/).filter(item => item.trim());
+            let output = '';
+            output += `https://www.whois.com/whois/${encodeURIComponent(input)}\n`;
+
+
+            document.getElementById('whoisOutput').value = output.trim();
         }
     </script>
 </body>
