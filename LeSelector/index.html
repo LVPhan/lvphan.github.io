@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeSelector</title>
+    <title>LeSelector 🤔</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center min-h-screen">
     <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
-        <h1 class="text-3xl font-bold mb-4 text-center text-blue-600">LeSelector</h1>
+        <h1 class="text-3xl font-bold mb-4 text-center text-blue-600">Meeting Selector</h1>
         <p id="dateDisplay" class="text-center text-gray-600 mb-4 text-lg"></p>
         <div id="resultDisplay" class="text-center mb-6 min-h-[120px] bg-blue-50 p-4 rounded-lg">
-            <p class="text-gray-500">Click "Roll Names" to choose who is doing Staff and Stand Up with a backup</p>
+            <p class="text-gray-500">Click "Roll Names" to choose participants</p>
         </div>
-        <div class="flex justify-between space-x-4">
+        <div class="flex justify-between space-x-4 mb-6">
             <button id="selectButton" onclick="selectNames()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors duration-300 transform hover:scale-105 flex items-center justify-center">
                 🎲 Roll Names
             </button>
             <button onclick="resetSelections()" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors duration-300 transform hover:scale-105 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg> 
-				Reset
+                Reset
             </button>
+        </div>
+        <div id="previousWeekDisplay" class="bg-blue-50 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold text-blue-600 mb-2">Last Week's Participants</h2>
+            <div id="previousWeekNames" class="text-center">
+                <p class="text-gray-500">No previous selections</p>
+            </div>
         </div>
     </div>
 
@@ -39,6 +42,8 @@
             backup: null
         };
 
+        let lastWeekSelections = null;
+
         function getNextWednesday() {
             const today = new Date();
             const nextWednesday = new Date(today);
@@ -52,8 +57,30 @@
 
         function loadPreviousSelections() {
             const storedSelections = localStorage.getItem('meetingSelections');
+            const storedLastWeekSelections = localStorage.getItem('lastWeekMeetingSelections');
+            
             if (storedSelections) {
                 previouslySelected = JSON.parse(storedSelections);
+            }
+            
+            if (storedLastWeekSelections) {
+                lastWeekSelections = JSON.parse(storedLastWeekSelections);
+                updatePreviousWeekDisplay();
+            }
+        }
+
+        function updatePreviousWeekDisplay() {
+            const previousWeekNames = document.getElementById('previousWeekNames');
+            if (lastWeekSelections) {
+                previousWeekNames.innerHTML = `
+                    <div class="text-lg">
+                        <div><strong class="text-blue-600">Stand Up:</strong> ${lastWeekSelections.standUp}</div>
+                        <div><strong class="text-blue-600">Staff:</strong> ${lastWeekSelections.staff}</div>
+                        <div><strong class="text-blue-600">Backup:</strong> ${lastWeekSelections.backup}</div>
+                    </div>
+                `;
+            } else {
+                previousWeekNames.innerHTML = '<p class="text-gray-500">No previous selections</p>';
             }
         }
 
@@ -66,7 +93,7 @@
                 <div class="flex justify-center items-center">
                     <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3M2OGJ2YnFmdmg1ZHZyempzYXBtcm9tMzRjNzBxaTJlMzVpbnlhcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPa2TdahY8LAAxy/giphy.webp" alt="Loading" class="max-w-full h-auto">
                 </div>
-                <p class="text-blue-500 mt-2">ALL IN ON RED 🔴!</p>
+                <p class="text-blue-500 mt-2">Rolling names...</p>
             `;
             selectButton.disabled = true;
             selectButton.classList.add('opacity-50', 'cursor-not-allowed');
@@ -95,6 +122,13 @@
 
                 const selections = { standUp, staff, backup };
 
+                // Store current selections as last week's selections
+                if (previouslySelected.standUp) {
+                    lastWeekSelections = previouslySelected;
+                    localStorage.setItem('lastWeekMeetingSelections', JSON.stringify(lastWeekSelections));
+                    updatePreviousWeekDisplay();
+                }
+
                 resultDisplay.innerHTML = `
                     <div>
                         <div class="text-xl mb-2">
@@ -121,9 +155,12 @@
 
         function resetSelections() {
             localStorage.removeItem('meetingSelections');
+            localStorage.removeItem('lastWeekMeetingSelections');
             previouslySelected = { standUp: null, staff: null, backup: null };
-            document.getElementById('resultDisplay').innerHTML = '<p class="text-gray-500">Click "Roll Names" to choose who is doing Staff and Stand Up with a backup</p>';
+            lastWeekSelections = null;
+            document.getElementById('resultDisplay').innerHTML = '<p class="text-gray-500">Click "Roll Names" to choose participants</p>';
             document.getElementById('dateDisplay').textContent = '';
+            updatePreviousWeekDisplay();
         }
 
         loadPreviousSelections();
