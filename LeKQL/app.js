@@ -23,9 +23,10 @@ function LeKQL() {
     }, [queries]);
 
     const addQuery = () => {
+        // Ensure all necessary fields are filled out
         if (newQuery.name && newQuery.code) {
             const timestamp = new Date().toISOString();
-            setQueries([...queries, {
+            const newQueryObj = {
                 id: Date.now(),
                 ...newQuery,
                 version: '1.0',
@@ -36,9 +37,17 @@ function LeKQL() {
                     documentation: newQuery.documentation,
                     timestamp
                 }]
-            }]);
+            };
+
+            // Add new query to the state
+            setQueries((prevQueries) => [...prevQueries, newQueryObj]);
+
+            // Reset the form after adding the query
             setNewQuery({ name: '', code: '', documentation: '', tags: '' });
             setShowAddForm(false);
+        } else {
+            // Handle the case when the required fields are not filled
+            alert("Please fill in both the query name and code.");
         }
     };
 
@@ -77,6 +86,14 @@ function LeKQL() {
         setExpandedQueries(prev => ({
             ...prev,
             [id]: !prev[id]
+        }));
+    };
+
+    const setEditingQueryAndExpand = (query) => {
+        setEditingQuery(query); // Set the editing query
+        setExpandedQueries(prev => ({
+            ...prev,
+            [query.id]: true // Ensure the query expands when editing
         }));
     };
 
@@ -224,7 +241,7 @@ function LeKQL() {
                                 </button>
                                 <button 
                                     className="button button-outline"
-                                    onClick={() => setEditingQuery(query)}
+                                    onClick={() => setEditingQueryAndExpand(query)} // Use the new function
                                 >
                                     Edit
                                 </button>
@@ -284,7 +301,7 @@ function LeKQL() {
                                                 {query.documentation}
                                             </div>
                                         </div>
-                                        
+                                      
                                         <div>
                                             <h4 className="font-bold mb-2">Query Code</h4>
                                             <pre className="code-block">
