@@ -29,49 +29,77 @@ function KQLQueryManager() {
     }, [queries, expandedQueries]);
 
     const addQuery = () => {
-        if (newQuery.name && newQuery.code) {
-            const timestamp = new Date().toISOString();
-            setQueries([...queries, {
+    if (!newQuery.name.trim() || !newQuery.code.trim()) {
+        alert('Query name and code are required.');
+        return;
+    }
+
+    try {
+        const timestamp = new Date().toISOString();
+        setQueries([
+            ...queries,
+            {
                 id: Date.now(),
                 ...newQuery,
                 version: '1.0',
                 timestamp,
-                history: [{
-                    version: '1.0',
-                    code: newQuery.code,
-                    documentation: newQuery.documentation,
-                    timestamp
-                }]
-            }]);
-            setNewQuery({ name: '', code: '', documentation: '', tags: '' });
-            setShowAddForm(false);
-        }
+                history: [
+                    {
+                        version: '1.0',
+                        code: newQuery.code,
+                        documentation: newQuery.documentation,
+                        timestamp,
+                    },
+                ],
+            },
+        ]);
+        setNewQuery({ name: '', code: '', documentation: '', tags: [] });
+        setShowAddForm(false);
+    } catch (error) {
+        console.error('Failed to add query:', error);
+        alert('An error occurred while adding the query. Please try again.');
+    }
     };
 
+
     const updateQuery = (id) => {
-        const timestamp = new Date().toISOString();
-        const currentQuery = queries.find(q => q.id === id);
-        const newVersion = (parseFloat(currentQuery.version) + 0.1).toFixed(1);
-        
-        setQueries(queries.map(query => {
+    const timestamp = new Date().toISOString();
+    const currentQuery = queries.find((q) => q.id === id);
+
+    // Check for duplicate names
+    const duplicateName = queries.some(
+        (query) => query.name === editingQuery.name && query.id !== id
+    );
+
+    const newVersion = duplicateName
+        ? (parseFloat(currentQuery.version) + 0.1).toFixed(1)
+        : currentQuery.version;
+
+    setQueries(
+        queries.map((query) => {
             if (query.id === id) {
                 return {
                     ...query,
                     ...editingQuery,
                     version: newVersion,
                     timestamp,
-                    history: [...query.history, {
-                        version: newVersion,
-                        code: editingQuery.code,
-                        documentation: editingQuery.documentation,
-                        timestamp
-                    }]
+                    history: [
+                        ...query.history,
+                        {
+                            version: newVersion,
+                            code: editingQuery.code,
+                            documentation: editingQuery.documentation,
+                            timestamp,
+                        },
+                    ],
                 };
             }
             return query;
-        }));
-        setEditingQuery(null);
+        })
+    );
+    setEditingQuery(null);
     };
+
 
     const deleteQuery = (id) => {
         if (window.confirm('Are you sure you want to delete this query?')) {
