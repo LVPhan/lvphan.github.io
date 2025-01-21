@@ -19,8 +19,11 @@ function KQLQueryManager() {
     const [expandedQueries, setExpandedQueries] = useState({});
 
     useEffect(() => {
-        localStorage.setItem('kql-queries', JSON.stringify(queries));
-    }, [queries]);
+    // Re-highlight all code blocks whenever queries change or expand state changes
+    if (typeof Prism !== 'undefined') {
+        Prism.highlightAll();
+    }
+    }, [queries, expandedQueries]);
 
     const addQuery = () => {
         if (newQuery.name && newQuery.code) {
@@ -286,9 +289,9 @@ function KQLQueryManager() {
                                         </div>
                                         
                                         <div>
-                                            <h4 className="font-bold mb-2">Query Code</h4>
+                                            <h4 className="font-bold mb-2">Code</h4>
                                             <pre className="code-block">
-                                                <code>{query.code}</code>
+                                                <code className="language-sql">{query.code}</code>
                                             </pre>
                                         </div>
                                     </>
