@@ -13,8 +13,10 @@ function KQLQueryManager() {
         tags: []
     });
     
+    const [editingQuery, setEditingQuery] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [expandedQueries, setExpandedQueries] = useState({});
 
     useEffect(() => {
         localStorage.setItem('kql-queries', JSON.stringify(queries));
@@ -38,6 +40,44 @@ function KQLQueryManager() {
             setNewQuery({ name: '', code: '', documentation: '', tags: '' });
             setShowAddForm(false);
         }
+    };
+
+    const updateQuery = (id) => {
+        const timestamp = new Date().toISOString();
+        const currentQuery = queries.find(q => q.id === id);
+        const newVersion = (parseFloat(currentQuery.version) + 0.1).toFixed(1);
+        
+        setQueries(queries.map(query => {
+            if (query.id === id) {
+                return {
+                    ...query,
+                    ...editingQuery,
+                    version: newVersion,
+                    timestamp,
+                    history: [...query.history, {
+                        version: newVersion,
+                        code: editingQuery.code,
+                        documentation: editingQuery.documentation,
+                        timestamp
+                    }]
+                };
+            }
+            return query;
+        }));
+        setEditingQuery(null);
+    };
+
+    const deleteQuery = (id) => {
+        if (window.confirm('Are you sure you want to delete this query?')) {
+            setQueries(queries.filter(query => query.id !== id));
+        }
+    };
+
+    const toggleExpand = (id) => {
+        setExpandedQueries(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
     };
 
     const copyToClipboard = async (text) => {
@@ -84,7 +124,7 @@ function KQLQueryManager() {
     );
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full mx-auto">
             <h1 className="text-3xl font-bold mb-6">KQL Query Manager</h1>
             
             <div className="mb-6 flex gap-4">
@@ -175,27 +215,86 @@ function KQLQueryManager() {
                                     ))}
                                 </div>
                             </div>
-                            <button 
-                                className="button button-outline"
-                                onClick={() => copyToClipboard(query.code)}
-                            >
-                                Copy Code
-                            </button>
-                        </div>
-                        
-                        <div className="mb-4">
-                            <h4 className="font-bold mb-2">Documentation</h4>
-                            <div className="bg-gray-50 p-3 rounded">
-                                {query.documentation}
+                            <div className="flex gap-2">
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => copyToClipboard(query.code)}
+                                >
+                                    Copy Code
+                                </button>
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => setEditingQuery(query)}
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => deleteQuery(query.id)}
+                                >
+                                    Delete
+                                </button>
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => toggleExpand(query.id)}
+                                >
+                                    {expandedQueries[query.id] ? '▼' : '▶'}
+                                </button>
                             </div>
                         </div>
                         
-                        <div>
-                            <h4 className="font-bold mb-2">Query Code</h4>
-                            <pre className="code-block">
-                                <code>{query.code}</code>
-                            </pre>
-                        </div>
+                        {expandedQueries[query.id] && (
+                            <>
+                                {editingQuery && editingQuery.id === query.id ? (
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            value={editingQuery.name}
+                                            onChange={(e) => setEditingQuery({...editingQuery, name: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                        />
+                                        <textarea
+                                            value={editingQuery.code}
+                                            onChange={(e) => setEditingQuery({...editingQuery, code: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded font-mono"
+                                            rows={5}
+                                        />
+                                        <textarea
+                                            value={editingQuery.documentation}
+                                            onChange={(e) => setEditingQuery({...editingQuery, documentation: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                            rows={3}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={editingQuery.tags.join(',')}
+                                            onChange={(e) => setEditingQuery({...editingQuery, tags: e.target.value.split(',')})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button className="button" onClick={() => updateQuery(query.id)}>Save Changes</button>
+                                            <button className="button button-outline" onClick={() => setEditingQuery(null)}>Cancel</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="mb-4">
+                                            <h4 className="font-bold mb-2">Documentation</h4>
+                                            <div className="bg-gray-50 p-3 rounded">
+                                                {query.documentation}
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 className="font-bold mb-2">Query Code</h4>
+                                            <pre className="code-block">
+                                                <code>{query.code}</code>
+                                            </pre>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
                     </div>
                 ))}
             </div>
