@@ -16,7 +16,13 @@ function KQLQueryManager() {
     const [editingQuery, setEditingQuery] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [expandedQueries, setExpandedQueries] = useState({});
+    const [expandedQueries, setExpandedQueries] = useState(() =>
+        queries.reduce((acc, query) => {
+            acc[query.id] = true; // Default all cards to expanded
+            return acc;
+        }, {})
+    );
+
 
     useEffect(() => {
     localStorage.setItem('kql-queries', JSON.stringify(queries));
@@ -118,6 +124,16 @@ function KQLQueryManager() {
         }));
     };
 
+    const setEditingQueryWithExpand = (query) => {
+        setEditingQuery(query);
+        if (query) {
+            setExpandedQueries((prev) => ({
+                ...prev,
+                [query.id]: true, // Ensure the card is expanded when editing
+            }));
+        }
+    };
+
     const copyToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -178,10 +194,10 @@ function KQLQueryManager() {
                     onClick={() => setShowAddForm(true)}
                 >
                     Add New Query
-                </button>
-                <button 
-                    className="button button-outline"
+               <button
+                    className={`button ${queries.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                     onClick={exportQueries}
+                    disabled={queries.length === 0}  // Disable the button if there are no queries
                 >
                     Export
                 </button>
