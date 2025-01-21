@@ -5,16 +5,18 @@ function LeKQL() {
         const saved = localStorage.getItem('kql-queries');
         return saved ? JSON.parse(saved) : [];
     });
-    
+
     const [newQuery, setNewQuery] = useState({
         name: '',
         code: '',
         documentation: '',
         tags: []
     });
-    
+
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [collapsed, setCollapsed] = useState({}); // State for collapsible cards
 
     useEffect(() => {
         localStorage.setItem('kql-queries', JSON.stringify(queries));
@@ -51,7 +53,7 @@ function LeKQL() {
 
     const exportQueries = () => {
         const dataStr = JSON.stringify(queries, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute('href', dataUri);
         downloadAnchorNode.setAttribute('download', 'kql-queries.json');
@@ -63,7 +65,7 @@ function LeKQL() {
     const importQueries = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
-        
+
         reader.onload = (e) => {
             try {
                 const importedQueries = JSON.parse(e.target.result);
@@ -73,20 +75,34 @@ function LeKQL() {
                 alert('Error importing file');
             }
         };
-        
+
         reader.readAsText(file);
     };
 
-    const filteredQueries = queries.filter(query => 
+    const filteredQueries = queries.filter(query =>
         query.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.documentation.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const toggleCollapse = (id) => {
+        setCollapsed((prev) => ({
+            ...prev,
+            [id]: !prev[id], // Toggle the collapsed state of the card
+        }));
+    };
+
+    const expandCardForEditing = (id) => {
+        setCollapsed((prev) => ({
+            ...prev,
+            [id]: false, // Ensure card is expanded when editing
+        }));
+    };
+
     return (
         <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">KQL Query Manager</h1>
-            
+            <h1 className="text-3xl font-bold mb-6">LeKQL</h1>
+
             <div className="mb-6 flex gap-4">
                 <input
                     type="text"
@@ -95,15 +111,16 @@ function LeKQL() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="p-2 border rounded"
                 />
-                <button 
+                <button
                     className="button"
                     onClick={() => setShowAddForm(true)}
                 >
                     Add New Query
                 </button>
-                <button 
+                <button
                     className="button button-outline"
                     onClick={exportQueries}
+                    disabled={queries.length === 0}
                 >
                     Export
                 </button>
@@ -129,20 +146,20 @@ function LeKQL() {
                         type="text"
                         placeholder="Query Name"
                         value={newQuery.name}
-                        onChange={(e) => setNewQuery({...newQuery, name: e.target.value})}
+                        onChange={(e) => setNewQuery({ ...newQuery, name: e.target.value })}
                         className="w-full p-2 mb-4 border rounded"
                     />
                     <textarea
-                        placeholder="KQL Code"
+                        placeholder="Code"
                         value={newQuery.code}
-                        onChange={(e) => setNewQuery({...newQuery, code: e.target.value})}
+                        onChange={(e) => setNewQuery({ ...newQuery, code: e.target.value })}
                         className="w-full p-2 mb-4 border rounded font-mono"
                         rows={5}
                     />
                     <textarea
                         placeholder="Documentation"
                         value={newQuery.documentation}
-                        onChange={(e) => setNewQuery({...newQuery, documentation: e.target.value})}
+                        onChange={(e) => setNewQuery({ ...newQuery, documentation: e.target.value })}
                         className="w-full p-2 mb-4 border rounded"
                         rows={3}
                     />
@@ -150,7 +167,7 @@ function LeKQL() {
                         type="text"
                         placeholder="Tags (comma-separated)"
                         value={newQuery.tags}
-                        onChange={(e) => setNewQuery({...newQuery, tags: e.target.value.split(',')})}
+                        onChange={(e) => setNewQuery({ ...newQuery, tags: e.target.value.split(',') })}
                         className="w-full p-2 mb-4 border rounded"
                     />
                     <div className="flex gap-2">
@@ -175,27 +192,45 @@ function LeKQL() {
                                     ))}
                                 </div>
                             </div>
-                            <button 
-                                className="button button-outline"
-                                onClick={() => copyToClipboard(query.code)}
-                            >
-                                Copy Code
-                            </button>
-                        </div>
-                        
-                        <div className="mb-4">
-                            <h4 className="font-bold mb-2">Documentation</h4>
-                            <div className="bg-gray-50 p-3 rounded">
-                                {query.documentation}
+                            <div>
+                                <button
+                                    className="button button-outline"
+                                    onClick={() => copyToClipboard(query.code)}
+                                >
+                                    Copy Code
+                                </button>
+                                <button
+                                    className="ml-2 text-sm"
+                                    onClick={() => expandCardForEditing(query.id)} // Expand card for editing
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    className="ml-2 text-sm"
+                                    onClick={() => toggleCollapse(query.id)} // Toggle collapse
+                                >
+                                    {collapsed[query.id] ? '▲' : '▼'}
+                                </button>
                             </div>
                         </div>
-                        
-                        <div>
-                            <h4 className="font-bold mb-2">Query Code</h4>
-                            <pre className="code-block">
-                                <code>{query.code}</code>
-                            </pre>
-                        </div>
+
+                        {!collapsed[query.id] && (
+                            <>
+                                <div className="mb-4">
+                                    <h4 className="font-bold mb-2">Documentation</h4>
+                                    <div className="bg-gray-50 p-3 rounded">
+                                        {query.documentation}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-bold mb-2">Query Code</h4>
+                                    <pre className="code-block">
+                                        <code>{query.code}</code>
+                                    </pre>
+                                </div>
+                            </>
+                        )}
                     </div>
                 ))}
             </div>
