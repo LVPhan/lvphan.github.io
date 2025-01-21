@@ -19,7 +19,10 @@ function KQLQueryManager() {
     const [expandedQueries, setExpandedQueries] = useState({});
 
     useEffect(() => {
-    // Re-highlight all code blocks whenever queries change or expand state changes
+    localStorage.setItem('kql-queries', JSON.stringify(queries));
+    }, [queries])
+
+    useEffect(() => {
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
     }
