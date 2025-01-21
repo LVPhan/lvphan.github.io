@@ -29,39 +29,43 @@ function KQLQueryManager() {
     }, [queries, expandedQueries]);
 
     const addQuery = () => {
-    if (!newQuery.name.trim() || !newQuery.code.trim()) {
-        alert('Query name and code are required.');
-        return;
-    }
-
-    try {
-        const timestamp = new Date().toISOString();
-        setQueries([
-            ...queries,
-            {
-                id: Date.now(),
-                ...newQuery,
-                version: '1.0',
-                timestamp,
-                history: [
-                    {
-                        version: '1.0',
-                        code: newQuery.code,
-                        documentation: newQuery.documentation,
-                        timestamp,
-                    },
-                ],
-            },
-        ]);
-        setNewQuery({ name: '', code: '', documentation: '', tags: [] });
-        setShowAddForm(false);
-    } catch (error) {
-        console.error('Failed to add query:', error);
-        alert('An error occurred while adding the query. Please try again.');
-    }
+        if (!newQuery.name.trim()) {
+            alert('Query name is required.');
+            return;
+        }
+    
+        try {
+            const sanitizedCode = newQuery.code
+                ? newQuery.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') // Sanitize code if present
+                : ''; // Default to an empty string if no code is provided
+    
+            const timestamp = new Date().toISOString();
+            setQueries([
+                ...queries,
+                {
+                    id: Date.now(),
+                    ...newQuery,
+                    code: sanitizedCode,
+                    version: '1.0',
+                    timestamp,
+                    history: [
+                        {
+                            version: '1.0',
+                            code: sanitizedCode,
+                            documentation: newQuery.documentation,
+                            timestamp,
+                        },
+                    ],
+                },
+            ]);
+            setNewQuery({ name: '', code: '', documentation: '', tags: [] });
+            setShowAddForm(false);
+        } catch (error) {
+            console.error('Failed to add query:', error);
+            alert('An error occurred while adding the query. Please try again.');
+        }
     };
-
-
+    
     const updateQuery = (id) => {
     const timestamp = new Date().toISOString();
     const currentQuery = queries.find((q) => q.id === id);
