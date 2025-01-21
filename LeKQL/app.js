@@ -23,17 +23,19 @@ function KQLQueryManager() {
         }, {})
     );
 
-
+    // Save queries to localStorage
     useEffect(() => {
-    localStorage.setItem('kql-queries', JSON.stringify(queries));
-    }, [queries])
+        localStorage.setItem('kql-queries', JSON.stringify(queries));
+    }, [queries]);
 
+    // Highlight code when queries or expanded state changes
     useEffect(() => {
-    if (typeof Prism !== 'undefined') {
-        Prism.highlightAll();
-    }
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
     }, [queries, expandedQueries]);
 
+    // Add a new query
     const addQuery = () => {
         if (!newQuery.name.trim()) {
             alert('Query name is required.');
@@ -42,8 +44,8 @@ function KQLQueryManager() {
     
         try {
             const sanitizedCode = newQuery.code
-                ? newQuery.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') // Sanitize code if present
-                : ''; // Default to an empty string if no code is provided
+                ? newQuery.code.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                : ''; 
     
             const timestamp = new Date().toISOString();
             setQueries([
@@ -71,52 +73,51 @@ function KQLQueryManager() {
             alert('An error occurred while adding the query. Please try again.');
         }
     };
-    
+
+    // Update an existing query
     const updateQuery = (id) => {
-    const timestamp = new Date().toISOString();
-    const currentQuery = queries.find((q) => q.id === id);
+        const timestamp = new Date().toISOString();
+        const currentQuery = queries.find((q) => q.id === id);
+        const duplicateName = queries.some(
+            (query) => query.name === editingQuery.name && query.id !== id
+        );
+        const newVersion = duplicateName
+            ? (parseFloat(currentQuery.version) + 0.1).toFixed(1)
+            : currentQuery.version;
 
-    // Check for duplicate names
-    const duplicateName = queries.some(
-        (query) => query.name === editingQuery.name && query.id !== id
-    );
-
-    const newVersion = duplicateName
-        ? (parseFloat(currentQuery.version) + 0.1).toFixed(1)
-        : currentQuery.version;
-
-    setQueries(
-        queries.map((query) => {
-            if (query.id === id) {
-                return {
-                    ...query,
-                    ...editingQuery,
-                    version: newVersion,
-                    timestamp,
-                    history: [
-                        ...query.history,
-                        {
-                            version: newVersion,
-                            code: editingQuery.code,
-                            documentation: editingQuery.documentation,
-                            timestamp,
-                        },
-                    ],
-                };
-            }
-            return query;
-        })
-    );
-    setEditingQuery(null);
+        setQueries(
+            queries.map((query) => {
+                if (query.id === id) {
+                    return {
+                        ...query,
+                        ...editingQuery,
+                        version: newVersion,
+                        timestamp,
+                        history: [
+                            ...query.history,
+                            {
+                                version: newVersion,
+                                code: editingQuery.code,
+                                documentation: editingQuery.documentation,
+                                timestamp,
+                            },
+                        ],
+                    };
+                }
+                return query;
+            })
+        );
+        setEditingQuery(null);
     };
 
-
+    // Delete a query
     const deleteQuery = (id) => {
         if (window.confirm('Are you sure you want to delete this query?')) {
             setQueries(queries.filter(query => query.id !== id));
         }
     };
 
+    // Toggle expand/collapse of query cards
     const toggleExpand = (id) => {
         setExpandedQueries(prev => ({
             ...prev,
@@ -124,6 +125,7 @@ function KQLQueryManager() {
         }));
     };
 
+    // Set query for editing with expanded state
     const setEditingQueryWithExpand = (query) => {
         setEditingQuery(query);
         if (query) {
@@ -134,6 +136,7 @@ function KQLQueryManager() {
         }
     };
 
+    // Copy query code to clipboard
     const copyToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -143,7 +146,9 @@ function KQLQueryManager() {
         }
     };
 
+    // Export queries
     const exportQueries = () => {
+        if (queries.length === 0) return;
         const dataStr = JSON.stringify(queries, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
         const downloadAnchorNode = document.createElement('a');
@@ -154,6 +159,7 @@ function KQLQueryManager() {
         downloadAnchorNode.remove();
     };
 
+    // Import queries from file
     const importQueries = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -171,6 +177,7 @@ function KQLQueryManager() {
         reader.readAsText(file);
     };
 
+    // Filter queries based on search term
     const filteredQueries = queries.filter(query => 
         query.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -181,6 +188,7 @@ function KQLQueryManager() {
         <div className="w-full mx-auto">
             <h1 className="text-3xl font-bold mb-6">LeKQL</h1>
             
+            {/* Search Bar */}
             <div className="mb-6 flex gap-4">
                 <input
                     type="text"
@@ -194,10 +202,11 @@ function KQLQueryManager() {
                     onClick={() => setShowAddForm(true)}
                 >
                     Add New Query
-               <button
+                </button>
+                <button
                     className={`button ${queries.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                     onClick={exportQueries}
-                    disabled={queries.length === 0}  // Disable the button if there are no queries
+                    disabled={queries.length === 0}
                 >
                     Export
                 </button>
@@ -216,6 +225,7 @@ function KQLQueryManager() {
                 </button>
             </div>
 
+            {/* New Query Form */}
             {showAddForm && (
                 <div className="card mb-6">
                     <h2 className="text-xl font-bold mb-4">Add New Query</h2>
@@ -247,111 +257,51 @@ function KQLQueryManager() {
                         onChange={(e) => setNewQuery({...newQuery, tags: e.target.value.split(',')})}
                         className="w-full p-2 mb-4 border rounded"
                     />
-                    <div className="flex gap-2">
-                        <button className="button" onClick={addQuery}>Save Query</button>
-                        <button className="button button-outline" onClick={() => setShowAddForm(false)}>Cancel</button>
-                    </div>
+                    <button className="button" onClick={addQuery}>Add Query</button>
+                    <button className="button button-outline" onClick={() => setShowAddForm(false)}>Cancel</button>
                 </div>
             )}
 
-            <div>
-                {filteredQueries.map(query => (
-                    <div key={query.id} className="card">
-                        <div className="flex justify-between items-start mb-4">
+            {/* Query List */}
+            {filteredQueries.length === 0 ? (
+                <p>No queries found</p>
+            ) : (
+                filteredQueries.map((query) => (
+                    <div key={query.id} className="card mb-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">{query.name}</h2>
                             <div>
-                                <h3 className="text-xl font-bold">{query.name}</h3>
-                                <div className="text-sm text-gray-500">
-                                    Version {query.version} • {new Date(query.timestamp).toLocaleDateString()}
-                                </div>
-                                <div className="mt-2">
-                                    {query.tags.map(tag => (
-                                        <span key={tag} className="tag">{tag}</span>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <button 
-                                    className="button button-outline"
-                                    onClick={() => copyToClipboard(query.code)}
-                                >
-                                    Copy Code
-                                </button>
-                                <button 
-                                    className="button button-outline"
-                                    onClick={() => setEditingQuery(query)}
+                                <button
+                                    className="button button-outline mr-2"
+                                    onClick={() => setEditingQueryWithExpand(query)}
                                 >
                                     Edit
                                 </button>
-                                <button 
+                                <button
                                     className="button button-outline"
                                     onClick={() => deleteQuery(query.id)}
                                 >
                                     Delete
                                 </button>
-                                <button 
-                                    className="button button-outline"
-                                    onClick={() => toggleExpand(query.id)}
-                                >
-                                    {expandedQueries[query.id] ? '▲' : '▼'}
-                                </button>
                             </div>
                         </div>
-                      
+
+                        {/* Query Code */}
                         {expandedQueries[query.id] && (
-                            <>
-                                {editingQuery && editingQuery.id === query.id ? (
-                                    <div className="mb-4">
-                                        <input
-                                            type="text"
-                                            value={editingQuery.name}
-                                            onChange={(e) => setEditingQuery({...editingQuery, name: e.target.value})}
-                                            className="w-full p-2 mb-4 border rounded"
-                                        />
-                                        <textarea
-                                            value={editingQuery.code}
-                                            onChange={(e) => setEditingQuery({...editingQuery, code: e.target.value})}
-                                            className="w-full p-2 mb-4 border rounded font-mono"
-                                            rows={5}
-                                        />
-                                        <textarea
-                                            value={editingQuery.documentation}
-                                            onChange={(e) => setEditingQuery({...editingQuery, documentation: e.target.value})}
-                                            className="w-full p-2 mb-4 border rounded"
-                                            rows={3}
-                                        />
-                                        <input
-                                            type="text"
-                                            value={editingQuery.tags.join(',')}
-                                            onChange={(e) => setEditingQuery({...editingQuery, tags: e.target.value.split(',')})}
-                                            className="w-full p-2 mb-4 border rounded"
-                                        />
-                                        <div className="flex gap-2">
-                                            <button className="button" onClick={() => updateQuery(query.id)}>Save Changes</button>
-                                            <button className="button button-outline" onClick={() => setEditingQuery(null)}>Cancel</button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="mb-4">
-                                            <h4 className="font-bold mb-2">Documentation</h4>
-                                            <div className="bg-gray-50 p-3 rounded">
-                                                {query.documentation}
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <h4 className="font-bold mb-2">Code</h4>
-                                            <pre className="code-block">
-                                                <code className="language-sql">{query.code}</code>
-                                            </pre>
-                                        </div>
-                                    </>
-                                )}
-                            </>
+                            <div className="mt-4">
+                                <pre className="code-block">{query.code}</pre>
+                                <button
+                                    className="button button-outline"
+                                    onClick={() => copyToClipboard(query.code)}
+                                >
+                                    Copy Code
+                                </button>
+                            </div>
                         )}
+
                     </div>
-                ))}
-            </div>
+                ))
+            )}
         </div>
     );
 }
