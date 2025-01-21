@@ -40,6 +40,14 @@ pre {
     border: 1px solid #2563eb;
 }
 
+pre.code-block {
+    overflow-x: auto; /* Keep horizontal scrolling if necessary */
+    word-wrap: break-word;
+    white-space: pre-wrap; /* Wrap long lines */
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .code-block {
     background-color: #1a1a1a !important;
     color: #ffffff;
