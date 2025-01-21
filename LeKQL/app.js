@@ -5,18 +5,18 @@ function LeKQL() {
         const saved = localStorage.getItem('kql-queries');
         return saved ? JSON.parse(saved) : [];
     });
-
+    
     const [newQuery, setNewQuery] = useState({
         name: '',
         code: '',
         documentation: '',
         tags: []
     });
-
+    
+    const [editingQuery, setEditingQuery] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-
-    const [collapsed, setCollapsed] = useState({}); // State for collapsible cards
+    const [expandedQueries, setExpandedQueries] = useState({});
 
     useEffect(() => {
         localStorage.setItem('kql-queries', JSON.stringify(queries));
@@ -42,6 +42,44 @@ function LeKQL() {
         }
     };
 
+    const updateQuery = (id) => {
+        const timestamp = new Date().toISOString();
+        const currentQuery = queries.find(q => q.id === id);
+        const newVersion = (parseFloat(currentQuery.version) + 0.1).toFixed(1);
+        
+        setQueries(queries.map(query => {
+            if (query.id === id) {
+                return {
+                    ...query,
+                    ...editingQuery,
+                    version: newVersion,
+                    timestamp,
+                    history: [...query.history, {
+                        version: newVersion,
+                        code: editingQuery.code,
+                        documentation: editingQuery.documentation,
+                        timestamp
+                    }]
+                };
+            }
+            return query;
+        }));
+        setEditingQuery(null);
+    };
+
+    const deleteQuery = (id) => {
+        if (window.confirm('Are you sure you want to delete this query?')) {
+            setQueries(queries.filter(query => query.id !== id));
+        }
+    };
+
+    const toggleExpand = (id) => {
+        setExpandedQueries(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
     const copyToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -53,7 +91,7 @@ function LeKQL() {
 
     const exportQueries = () => {
         const dataStr = JSON.stringify(queries, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute('href', dataUri);
         downloadAnchorNode.setAttribute('download', 'kql-queries.json');
@@ -65,7 +103,7 @@ function LeKQL() {
     const importQueries = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
-
+        
         reader.onload = (e) => {
             try {
                 const importedQueries = JSON.parse(e.target.result);
@@ -75,34 +113,20 @@ function LeKQL() {
                 alert('Error importing file');
             }
         };
-
+        
         reader.readAsText(file);
     };
 
-    const filteredQueries = queries.filter(query =>
+    const filteredQueries = queries.filter(query => 
         query.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
         query.documentation.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const toggleCollapse = (id) => {
-        setCollapsed((prev) => ({
-            ...prev,
-            [id]: !prev[id], // Toggle the collapsed state of the card
-        }));
-    };
-
-    const expandCardForEditing = (id) => {
-        setCollapsed((prev) => ({
-            ...prev,
-            [id]: false, // Ensure card is expanded when editing
-        }));
-    };
-
     return (
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">LeKQL</h1>
-
+            
             <div className="mb-6 flex gap-4">
                 <input
                     type="text"
@@ -111,16 +135,15 @@ function LeKQL() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="p-2 border rounded"
                 />
-                <button
+                <button 
                     className="button"
                     onClick={() => setShowAddForm(true)}
                 >
                     Add New Query
                 </button>
-                <button
+                <button 
                     className="button button-outline"
                     onClick={exportQueries}
-                    disabled={queries.length === 0}
                 >
                     Export
                 </button>
@@ -146,20 +169,20 @@ function LeKQL() {
                         type="text"
                         placeholder="Query Name"
                         value={newQuery.name}
-                        onChange={(e) => setNewQuery({ ...newQuery, name: e.target.value })}
+                        onChange={(e) => setNewQuery({...newQuery, name: e.target.value})}
                         className="w-full p-2 mb-4 border rounded"
                     />
                     <textarea
                         placeholder="Code"
                         value={newQuery.code}
-                        onChange={(e) => setNewQuery({ ...newQuery, code: e.target.value })}
+                        onChange={(e) => setNewQuery({...newQuery, code: e.target.value})}
                         className="w-full p-2 mb-4 border rounded font-mono"
                         rows={5}
                     />
                     <textarea
                         placeholder="Documentation"
                         value={newQuery.documentation}
-                        onChange={(e) => setNewQuery({ ...newQuery, documentation: e.target.value })}
+                        onChange={(e) => setNewQuery({...newQuery, documentation: e.target.value})}
                         className="w-full p-2 mb-4 border rounded"
                         rows={3}
                     />
@@ -167,7 +190,7 @@ function LeKQL() {
                         type="text"
                         placeholder="Tags (comma-separated)"
                         value={newQuery.tags}
-                        onChange={(e) => setNewQuery({ ...newQuery, tags: e.target.value.split(',') })}
+                        onChange={(e) => setNewQuery({...newQuery, tags: e.target.value.split(',')})}
                         className="w-full p-2 mb-4 border rounded"
                     />
                     <div className="flex gap-2">
@@ -192,43 +215,84 @@ function LeKQL() {
                                     ))}
                                 </div>
                             </div>
-                            <div>
-                                <button
+                            <div className="flex gap-2">
+                                <button 
                                     className="button button-outline"
                                     onClick={() => copyToClipboard(query.code)}
                                 >
                                     Copy Code
                                 </button>
-                                <button
-                                    className="ml-2 text-sm"
-                                    onClick={() => expandCardForEditing(query.id)} // Expand card for editing
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => setEditingQuery(query)}
                                 >
                                     Edit
                                 </button>
-                                <button
-                                    className="ml-2 text-sm"
-                                    onClick={() => toggleCollapse(query.id)} // Toggle collapse
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => deleteQuery(query.id)}
                                 >
-                                    {collapsed[query.id] ? '▲' : '▼'}
+                                    Delete
+                                </button>
+                                <button 
+                                    className="button button-outline"
+                                    onClick={() => toggleExpand(query.id)}
+                                >
+                                    {expandedQueries[query.id] ? '▼' : '▲'}
                                 </button>
                             </div>
                         </div>
-
-                        {!collapsed[query.id] && (
+                        
+                        {expandedQueries[query.id] && (
                             <>
-                                <div className="mb-4">
-                                    <h4 className="font-bold mb-2">Documentation</h4>
-                                    <div className="bg-gray-50 p-3 rounded">
-                                        {query.documentation}
+                                {editingQuery && editingQuery.id === query.id ? (
+                                    <div className="mb-4">
+                                        <input
+                                            type="text"
+                                            value={editingQuery.name}
+                                            onChange={(e) => setEditingQuery({...editingQuery, name: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                        />
+                                        <textarea
+                                            value={editingQuery.code}
+                                            onChange={(e) => setEditingQuery({...editingQuery, code: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded font-mono"
+                                            rows={5}
+                                        />
+                                        <textarea
+                                            value={editingQuery.documentation}
+                                            onChange={(e) => setEditingQuery({...editingQuery, documentation: e.target.value})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                            rows={3}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={editingQuery.tags.join(',')}
+                                            onChange={(e) => setEditingQuery({...editingQuery, tags: e.target.value.split(',')})}
+                                            className="w-full p-2 mb-4 border rounded"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button className="button" onClick={() => updateQuery(query.id)}>Save Changes</button>
+                                            <button className="button button-outline" onClick={() => setEditingQuery(null)}>Cancel</button>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-bold mb-2">Query Code</h4>
-                                    <pre className="code-block">
-                                        <code>{query.code}</code>
-                                    </pre>
-                                </div>
+                                ) : (
+                                    <>
+                                        <div className="mb-4">
+                                            <h4 className="font-bold mb-2">Documentation</h4>
+                                            <div className="bg-gray-50 p-3 rounded">
+                                                {query.documentation}
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 className="font-bold mb-2">Query Code</h4>
+                                            <pre className="code-block">
+                                                <code>{query.code}</code>
+                                            </pre>
+                                        </div>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
