@@ -131,7 +131,7 @@ function KQLQueryManager() {
 
     return (
         <div className="w-full mx-auto">
-            <h1 className="text-3xl font-bold mb-6">KQL Query Manager</h1>
+            <h1 className="text-3xl font-bold mb-6">LeKQL</h1>
             
             <div className="mb-6 flex gap-4">
                 <input
