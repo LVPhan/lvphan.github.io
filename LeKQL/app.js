@@ -244,11 +244,11 @@ function KQLQueryManager() {
                                     className="button button-outline"
                                     onClick={() => toggleExpand(query.id)}
                                 >
-                                    {expandedQueries[query.id] ? '▼' : '▶'}
+                                    {expandedQueries[query.id] ? '▲' : '▼'}
                                 </button>
                             </div>
                         </div>
-                        
+                      
                         {expandedQueries[query.id] && (
                             <>
                                 {editingQuery && editingQuery.id === query.id ? (
