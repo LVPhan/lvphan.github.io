@@ -1,7 +1,32 @@
+:root {
+    --bg-color: #f0f2f5;  /* Softer background */
+    --text-color: #2d2d2d;
+    --card-bg: #ffffff;
+    --border-color: #e0e3e7;
+    --hover-bg: #f3f4f6;
+    --code-bg: #1a1a1a;
+    --code-color: #ffffff;
+    --button-primary: #3b82f6;  /* Softer blue */
+    --button-hover: #2563eb;
+}
+
+.dark {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --hover-bg: #404040;
+    --code-bg: #000000;
+    --code-color: #ffffff;
+    --button-primary: #3b82f6;
+    --button-hover: #2563eb;
+}
+
 body {
     margin: 0;
     padding: 20px;
-    background-color: #f5f5f5;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 pre {
@@ -10,44 +35,112 @@ pre {
 }
 
 .card {
-    background: white;
+    background-color: var(--card-bg);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     margin-bottom: 16px;
     padding: 16px;
+    border: 1px solid var(--border-color);
 }
 
 .button {
-    background-color: #2563eb;
+    background-color: var(--button-primary);
     color: white;
     padding: 8px 16px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .button:hover {
-    background-color: #1d4ed8;
+    background-color: var(--button-hover);
 }
 
 .button-outline {
     background-color: transparent;
-    color: #2563eb;
-    border: 1px solid #2563eb;
+    color: var(--button-primary);
+    border: 1px solid var(--button-primary);
+}
+
+.dark .button-outline {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.button-outline:hover {
+    background-color: var(--hover-bg);
 }
 
 .code-block {
-    background-color: #1a1a1a;
-    color: #ffffff;
+    background-color: var(--code-bg) !important;
+    color: var(--code-color);
     padding: 16px;
     border-radius: 4px;
     margin: 8px 0;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
 }
 
 .tag {
-    background-color: #e5e7eb;
+    background-color: var(--hover-bg);
+    color: var(--text-color);
     padding: 4px 8px;
     border-radius: 4px;
     margin-right: 4px;
     font-size: 0.875rem;
+}
+
+/* Documentation area */
+.bg-gray-50 {
+    background-color: #edf2f7;  /* Softer gray for light mode */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.dark .bg-gray-50 {
+    background-color: #363636;
+}
+
+/* Form elements */
+input, textarea {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--button-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Prism syntax highlighting overrides */
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    background: var(--code-bg);
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    background: transparent;
+}
+
+/* Active edit button state */
+.dark .button-outline.bg-gray-200 {
+    background-color: var(--hover-bg);
+}
+
+/* Transitions */
+.card,
+.button,
+input,
+textarea,
+.tag {
+    transition: all 0.2s ease;
 }
