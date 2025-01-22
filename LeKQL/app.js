@@ -13,6 +13,7 @@ function LeKQL() {
         tags: []
     });
     
+    
     const [editingQuery, setEditingQuery] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +25,11 @@ function LeKQL() {
             ...acc,
             [query.id]: true
         }), {});
+    });
+
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const savedMode = localStorage.getItem('darkMode');
+        return savedMode ? JSON.parse(savedMode) : false;
     });
 
     useEffect(() => {
@@ -38,6 +44,15 @@ function LeKQL() {
             }, 0);
         }
     }, [queries, expandedQueries, searchTerm, editingQuery]);
+
+    useEffect(() => {
+        localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [isDarkMode]);
 
     // Update expandedQueries when new queries are added
     useEffect(() => {
@@ -185,10 +200,32 @@ function LeKQL() {
     });
     
     return (
-        <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">LeKQL 📋</h1>
+        <div className={`max-w-4xl mx-auto transition-colors duration-200 ${isDarkMode ? 'dark' : ''}`}>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold">LeKQL 📋</h1>
+                <button
+                    className="button button-outline inline-flex items-center"
+                    onClick={() => setIsDarkMode(!isDarkMode)}
+                >
+                    {isDarkMode ? (
+                        <>
+                            Light Mode
+                            <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </>
+                    ) : (
+                        <>
+                            Dark Mode
+                            <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </>
+                    )}
+                </button>
+            </div>
             
-            <div className="mb-6 flex gap-4">
+            <div className="mb-6 flex gap-4">   
                 <input
                     type="text"
                     placeholder="Search queries..."
