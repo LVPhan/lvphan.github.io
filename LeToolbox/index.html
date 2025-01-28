@@ -48,11 +48,33 @@
 
         .tools-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            max-width: 1400px;
+            max-width: 1700px;
             margin: 0 auto;
             justify-content: center;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 1700px) {
+            .tools-container {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 1200px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .tools-container {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 800px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .tools-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
         }
     
         .tool-card {
@@ -61,8 +83,7 @@
             padding: 20px;
             box-shadow: 0 2px 4px var(--card-shadow);
             transition: all 0.3s ease;
-            height: fit-content;
-            min-height: 80px;
+            min-width: 280px;
         }
 
         .tool-card:hover {
@@ -113,7 +134,11 @@
         }
         
         .copy-btn {
-            background: #28a745;
+        background: #28a745;
+        width: 120px;  /* Fixed width */
+        white-space: nowrap;  /* Prevent text wrapping */
+        min-width: 120px;    /* Ensure minimum width */
+        box-sizing: border-box; /* Include padding in width calculation */
         }
         
         .copy-btn:hover {
@@ -324,11 +349,15 @@
             </div>
             <div class="tool-content">
                 <textarea id="threatInput" placeholder="Enter IP(s) or domain(s) (one per line)"></textarea>
-                <div class="button-group">
-                    <button onclick="searchThreatIntel()">Generate URLs</button>
-                    <button onclick="openVirusTotal()">Open VT</button>
-                    <button onclick="openAbuseIPDB()">Open AbuseIPDB</button>
-                    <button class="copy-btn" onclick="copyText('threatOutput')">Copy Result</button>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 8px;">
+                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="searchThreatIntel()">Generate URLs</button>
+                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="openVirusTotal()">Open VT</button>
+                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="openAbuseIPDB()">Open AbuseIP</button>
+                    </div>
+                    <div style="display: flex; justify-content: flex-start;">
+                        <button class="copy-btn" onclick="copyText('threatOutput')">Copy Result</button>
+                    </div>
                 </div>
                 <textarea id="threatOutput" readonly placeholder="Generated search URL(s) will appear here"></textarea>
             </div>
@@ -390,6 +419,26 @@
             </div>
         </div>
         
+        <!-- Base64 Decoder Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                <h3>Base64 Encoder/Decoder</h3>
+                <p class="tool-description">Base64 encode a string or decode a Base64-encoded string into plain text.</p>
+            </div>
+            <span class="expand-icon">▼</span>
+        </div>
+        <div class="tool-content">
+            <textarea id="base64Input" placeholder="Enter Base64-encoded string here"></textarea>
+            <div class="button-group">
+                <button onclick="encodeBase64()">Encode</button>
+                <button onclick="decodeBase64()">Decode</button>
+                <button class="copy-btn" onclick="copyText('base64Output')">Copy Result</button>
+            </div>
+            <textarea id="base64Output" readonly placeholder="Encoded/Decoded result will appear here"></textarea>
+        </div>
+        </div>
+
         <!-- WHOIS Search Tool -->
         <div class="tool-card">
             <div class="tool-header">
@@ -697,6 +746,28 @@
             document.getElementById('qrFileInput').value = ""; // Clear the file input
             document.getElementById('qrImageUrl').value = "";  // Clear the URL input
             document.getElementById('qrDecodedOutput').value = ""; // Clear the decoded output
+        }
+
+        // Encode Text to Base64
+        function encodeBase64() {
+            const input = document.getElementById('base64Input').value.trim();
+            try {
+                const encoded = btoa(input); // Encode to Base64
+                document.getElementById('base64Output').value = encoded;
+            } catch (error) {
+                document.getElementById('base64Output').value = 'Invalid input for Base64 encoding';
+            }
+        }
+
+        // Decode Base64 Input
+        function decodeBase64() {
+            const input = document.getElementById('base64Input').value.trim();
+            try {
+                const decoded = atob(input); // Decode Base64
+                document.getElementById('base64Output').value = decoded;
+            } catch (error) {
+                document.getElementById('base64Output').value = 'Invalid Base64 input';
+            }
         }
 
         // WHOIS
