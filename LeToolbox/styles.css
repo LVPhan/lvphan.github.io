@@ -1,0 +1,290 @@
+/* Theme Variables */
+:root {
+    --bg-color: #f0f2f5;
+    --text-color: #000;
+    --card-bg: white;
+    --card-shadow: rgba(0,0,0,0.1);
+    --card-hover-shadow: rgba(0,0,0,0.2);
+    --border-color: #ddd;
+    --description-color: #666;
+    --sun-color: #FFD700;
+    --moon-color: #FFFFFF;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #fff;
+    --card-bg: #2d2d2d;
+    --card-shadow: rgba(0,0,0,0.3);
+    --card-hover-shadow: rgba(0,0,0,0.4);
+    --border-color: #404040;
+    --description-color: #aaa;
+    --sun-color: #FFFFFF;
+    --moon-color: #800080;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* Layout */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.tools-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1700px;
+    margin: 0 auto;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+/* Responsive Grid */
+@media (max-width: 1700px) {
+    .tools-container {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1200px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .tools-container {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 800px) {
+    .tools-container {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+}
+
+/* Card Styles */
+.tool-card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px var(--card-shadow);
+    transition: all 0.3s ease;
+    min-width: 280px;
+}
+
+.tool-card:hover {
+    box-shadow: 0 4px 8px var(--card-hover-shadow);
+}
+
+.tool-content {
+    display: block;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.tool-description {
+    color: var(--description-color);
+    font-size: 13px;
+    margin: 5px 0 0 0;
+}
+
+/* Form Elements */
+textarea {
+    width: calc(100% - 22px);
+    min-height: 120px;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+/* Button Styles */
+.button-group {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.copy-btn {
+    background: #28a745;
+    width: 120px;
+    white-space: nowrap;
+    min-width: 120px;
+    box-sizing: border-box;
+}
+
+.copy-btn:hover {
+    background: #218838;
+}
+
+/* Threat Intelligence Tool Specific */
+.threat-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.threat-buttons button {
+    width: auto;
+    min-width: min-content;
+}
+
+/* Dark Mode Toggle */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 0 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Icon Styles */
+.feather {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+.feather-sun,
+.feather-moon {
+    fill: none;
+    stroke-width: 2;
+}
+
+.feather-sun {
+    stroke: var(--sun-color);
+}
+
+.feather-moon {
+    stroke: var(--moon-color);
+    fill: var(--moon-color);
+}
+
+/* QR Code Tool Specific */
+.upload-section, .url-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--card-bg);
+}
+
+.upload-section label, .url-section label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+#qrImageUrl {
+    width: calc(100% - 22px);
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+#qrFileInput {
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+/* Footer */
+footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--description-color);
+}
+
+footer a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
