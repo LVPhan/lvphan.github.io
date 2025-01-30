@@ -5,308 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeToolbox 🧰</title>
     <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=92oZwSFODREJ&format=png&color=000000">
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr"></script>
-    <style>
-        :root {
-            --bg-color: #f0f2f5;
-            --text-color: #000;
-            --card-bg: white;
-            --card-shadow: rgba(0,0,0,0.1);
-            --card-hover-shadow: rgba(0,0,0,0.2);
-            --border-color: #ddd;
-            --description-color: #666;
-            --sun-color: #FFD700;   /* Dark yellow for sun in light mode */
-            --moon-color: #FFFFFF;  /* White for moon in light mode */
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #fff;
-            --card-bg: #2d2d2d;
-            --card-shadow: rgba(0,0,0,0.3);
-            --card-hover-shadow: rgba(0,0,0,0.4);
-            --border-color: #404040;
-            --description-color: #aaa;
-            --sun-color: #FFFFFF;   /* White for sun in dark mode */
-            --moon-color: #800080;  /* Purple for moon in dark mode */
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .tools-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            max-width: 1700px;
-            margin: 0 auto;
-            justify-content: center;
-            padding: 0 20px;
-        }
-
-        @media (max-width: 1700px) {
-            .tools-container {
-                grid-template-columns: repeat(3, 1fr);
-                max-width: 1200px;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .tools-container {
-                grid-template-columns: repeat(2, 1fr);
-                max-width: 800px;
-            }
-        }
-
-        @media (max-width: 800px) {
-            .tools-container {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-            }
-        }
-    
-        .tool-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px var(--card-shadow);
-            transition: all 0.3s ease;
-            min-width: 280px;
-        }
-
-        .tool-card:hover {
-            box-shadow: 0 4px 8px var(--card-hover-shadow);
-        }
-        
-        .tool-content {
-            display: block;
-            margin-top: 15px;
-            width: 100%;
-        }
-        
-        textarea {
-            width: calc(100% - 22px);
-            min-height: 120px;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            resize: vertical;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            background: var(--card-bg);
-            color: var(--text-color);
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-size: 14px;
-            min-width: 100px;
-        }
-        
-        button:hover {
-            background: #0056b3;
-        }
-        
-        .copy-btn {
-        background: #28a745;
-        width: 120px;  /* Fixed width */
-        white-space: nowrap;  /* Prevent text wrapping */
-        min-width: 120px;    /* Ensure minimum width */
-        box-sizing: border-box; /* Include padding in width calculation */
-        }
-        
-        .copy-btn:hover {
-            background: #218838;
-        }
-        
-        .tool-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-        
-        .tool-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
-        
-        .expand-icon {
-            font-size: 18px;
-            transition: transform 0.3s ease;
-            transform: rotate(180deg);
-        }
-        
-        .tool-description {
-            color: var(--description-color);
-            font-size: 14px;
-            margin: 5px 0 0 0;
-        }
-
-        /* Toggle Switches Container */
-        .toggles-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        /* Toggle Switch Styles */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-            margin: 0 10px;
-            margin-bottom: 5px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toggle-label {
-            font-size: 16px;
-            color: var(--text-color);
-        }
-        
-        .feather {
-            width: 24px;   /* Control the size */
-            height: 24px;  /* Control the size */
-            stroke-width: 2;
-        }
-
-        /* Apply colors to fill property */
-        .feather-sun,
-        .feather-moon {
-            fill: none;
-            stroke-width: 2;
-        }
-
-        .feather-sun {
-            stroke: var(--sun-color);
-        }
-
-        .feather-moon {
-            stroke: var(--moon-color);
-            fill: var(--moon-color); /* Ensure the moon is fully purple in dark mode */
-        }
-
-    </style>
+	<script src="script.js" defer></script>
 </head>
 <body>
     <div class="header">
         <h1>LeToolbox 🧰</h1>
-        <!-- Collapse Toggle -->
+        <!-- Dark Mode Toggle -->
         <div class="toggle-container">
-            <span class="toggle-label">Collapse All</span>
-            <label class="switch">
-                <input type="checkbox" id="toggleAll" checked>
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-label">Expand All</span>
-        </div>
-
-         <!-- Dark Mode Toggle -->
-         <div class="toggle-container">
             <svg class="feather feather-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                 <g>
-                  <path d="M30.63,16.77l-4.29,3.51l0.55,5.52c0.03,0.3-0.07,0.59-0.28,0.81c-0.22,0.21-0.51,0.31-0.81,0.28l-5.52-0.55l-3.51,4.29C16.58,30.86,16.3,31,16,31s-0.58-0.14-0.77-0.37l-3.51-4.29L6.2,26.89c-0.3,0.03-0.59-0.07-0.81-0.28c-0.21-0.22-0.31-0.51-0.28-0.81l0.55-5.52l-4.29-3.51C1.14,16.58,1,16.3,1,16s0.14-0.58,0.37-0.77l4.29-3.51L5.11,6.2C5.08,5.9,5.18,5.61,5.39,5.39C5.61,5.18,5.9,5.07,6.2,5.11l5.52,0.55l3.51-4.29c0.37-0.47,1.17-0.47,1.54,0l3.51,4.29l5.52-0.55c0.3-0.04,0.59,0.07,0.81,0.28C26.82,5.61,26.92,5.9,26.89,6.2l-0.55,5.52l4.29,3.51C30.86,15.42,31,15.7,31,16S30.86,16.58,30.63,16.77z" />
+                    <path d="M30.63,16.77l-4.29,3.51l0.55,5.52c0.03,0.3-0.07,0.59-0.28,0.81c-0.22,0.21-0.51,0.31-0.81,0.28l-5.52-0.55l-3.51,4.29C16.58,30.86,16.3,31,16,31s-0.58-0.14-0.77-0.37l-3.51-4.29L6.2,26.89c-0.3,0.03-0.59-0.07-0.81-0.28c-0.21-0.22-0.31-0.51-0.28-0.81l0.55-5.52l-4.29-3.51C1.14,16.58,1,16.3,1,16s0.14-0.58,0.37-0.77l4.29-3.51L5.11,6.2C5.08,5.9,5.18,5.61,5.39,5.39C5.61,5.18,5.9,5.07,6.2,5.11l5.52,0.55l3.51-4.29c0.37-0.47,1.17-0.47,1.54,0l3.51,4.29l5.52-0.55c0.3-0.04,0.59,0.07,0.81,0.28C26.82,5.61,26.92,5.9,26.89,6.2l-0.55,5.52l4.29,3.51C30.86,15.42,31,15.7,31,16S30.86,16.58,30.63,16.77z" />
                 </g>
                 <g>
-                  <path d="M23,16c0,3.86-3.14,7-7,7s-7-3.14-7-7s3.14-7,7-7S23,12.14,23,16z" />
+                    <path d="M23,16c0,3.86-3.14,7-7,7s-7-3.14-7-7s3.14-7,7-7S23,12.14,23,16z" />
                 </g>
-              </svg>
+            </svg>
             <label class="switch">
                 <input type="checkbox" id="darkModeToggle">
                 <span class="slider"></span>
             </label>
             <svg class="feather feather-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-              </svg>              
+            </svg>              
         </div>
     </div>
 
     <!-- Tool Container -->
     <div class="tools-container">
-
         <!-- Text Formatter Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>Text Formatter</h3>
-                    <p class="tool-description">Wraps text in quotes and ends with a coma (if more than 1)</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>Text Formatter</h3>
+            <p class="tool-description">Wraps text in quotes and ends with a coma (if more than 1)</p>
             <div class="tool-content">
                 <textarea id="textInput" placeholder="Enter text separated by commas or new lines"></textarea>
                 <div class="button-group">
@@ -319,13 +51,8 @@
 
         <!-- Defang/Refang Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>Defang and Fang</h3>
-                    <p class="tool-description">Defang or refang URL(s), IP(s), and Email(s)</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>Defang and Fang</h3>
+            <p class="tool-description">Defang or refang URL(s), IP(s), and Email(s)</p>
             <div class="tool-content">
                 <textarea id="fangInput" placeholder="Enter URL(s), IP(s), or Email(s) seperated by commas or new lines"></textarea>
                 <div class="button-group">
@@ -339,23 +66,18 @@
 
         <!-- VirusTotal and AbuseIPDB Search Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>Threat Intelligence Search</h3>
-                    <p class="tool-description">Search IPs/Domains on VirusTotal and AbuseIPDB</p>
-                    <p class="tool-description">Open buttons <b>ONLY</b> work <b>ONE</b> IP at a time</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>Threat Intelligence Search</h3>
+            <p class="tool-description">Search IPs/Domains on VirusTotal and AbuseIPDB</p>
+            <p class="tool-description">Open buttons <b>ONLY</b> work <b>ONE</b> IP at a time</p>
             <div class="tool-content">
                 <textarea id="threatInput" placeholder="Enter IP(s) or domain(s) (one per line)"></textarea>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; gap: 8px;">
-                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="searchThreatIntel()">Generate URLs</button>
-                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="openVirusTotal()">Open VT</button>
-                        <button style="min-width: 100px; white-space: nowrap; text-align: center;" onclick="openAbuseIPDB()">Open AbuseIP</button>
+                <div class="threat-buttons">
+                    <div class="button-group">
+                        <button onclick="searchThreatIntel()">Generate URLs</button>
+                        <button onclick="openVirusTotal()">Open VT</button>
+                        <button onclick="openAbuseIPDB()">Open AbuseIPDB</button>
                     </div>
-                    <div style="display: flex; justify-content: flex-start;">
+                    <div class="button-group">
                         <button class="copy-btn" onclick="copyText('threatOutput')">Copy Result</button>
                     </div>
                 </div>
@@ -365,14 +87,9 @@
 
         <!-- Safelink Decoder Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>Safelink Decoder</h3>
-                    <p class="tool-description">Decode Safelink and other obfuscated URLs</p>
-                    <p class="tool-description">EX: https://nam02.safelinks.protection.outlook.com/?url=...</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>Safelink Decoder</h3>
+            <p class="tool-description">Decode Safelink and other obfuscated URLs</p>
+            <p class="tool-description">EX: https://nam02.safelinks.protection.outlook.com/?url=...</p>
             <div class="tool-content">
                 <textarea id="safelinkInput" placeholder="Enter Safelink URL(s) seperated by commas or new lines"></textarea>
                 <div class="button-group">
@@ -385,16 +102,11 @@
 
         <!-- QR Decoder Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>QR Decoder</h3>
-                    <p class="tool-description">Decode QR codes from an uploaded image or an image URL.</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>QR Decoder</h3>
+            <p class="tool-description">Decode QR codes from an uploaded image or an image URL.</p>
             <div class="tool-content">
-                 <!-- Image Upload Section - Updated styles -->
-                 <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
+                <!-- Image Upload Section - Updated styles -->
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
                     <label for="qrFileInput" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Upload an Image:</label>
                     <input type="file" id="qrFileInput" accept="image/*" style="margin-bottom: 10px; color: var(--text-color);" />
                     <button onclick="decodeQRFromFile()" style="margin-right: 10px;">Decode Uploaded Image</button>
@@ -403,14 +115,14 @@
                 <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
                     <label for="qrImageUrl" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Paste an Image URL:</label>
                     <input type="text" id="qrImageUrl" placeholder="Paste an image URL" 
-                           style="width: calc(100% - 22px); 
-                                  margin-bottom: 10px; 
-                                  padding: 8px; 
-                                  border: 1px solid var(--border-color); 
-                                  border-radius: 4px; 
-                                  background-color: var(--card-bg); 
-                                  color: var(--text-color);
-                                  transition: background-color 0.3s ease, border-color 0.3s ease;" />
+                        style="width: calc(100% - 22px); 
+                                margin-bottom: 10px; 
+                                padding: 8px; 
+                                border: 1px solid var(--border-color); 
+                                border-radius: 4px; 
+                                background-color: var(--card-bg); 
+                                color: var(--text-color);
+                                transition: background-color 0.3s ease, border-color 0.3s ease;" />
                     <button onclick="decodeQRFromUrl()" style="margin-right: 10px;">Decode from URL</button>
                 </div>
                 <textarea id="qrDecodedOutput" readonly placeholder="Decoded URL will appear here"></textarea>
@@ -421,33 +133,23 @@
         
         <!-- Base64 Decoder Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                <h3>Base64 Encoder/Decoder</h3>
-                <p class="tool-description">Base64 encode a string or decode a Base64-encoded string into plain text.</p>
+            <h3>Base64 Encoder/Decoder</h3>
+            <p class="tool-description">Base64 encode a string or decode a Base64-encoded string into plain text.</p>
+            <div class="tool-content">
+                <textarea id="base64Input" placeholder="Enter Base64-encoded string here"></textarea>
+                <div class="button-group">
+                    <button onclick="encodeBase64()">Encode</button>
+                    <button onclick="decodeBase64()">Decode</button>
+                    <button class="copy-btn" onclick="copyText('base64Output')">Copy Result</button>
+                </div>
+                <textarea id="base64Output" readonly placeholder="Encoded/Decoded result will appear here"></textarea>
             </div>
-            <span class="expand-icon">▼</span>
-        </div>
-        <div class="tool-content">
-            <textarea id="base64Input" placeholder="Enter Base64-encoded string here"></textarea>
-            <div class="button-group">
-                <button onclick="encodeBase64()">Encode</button>
-                <button onclick="decodeBase64()">Decode</button>
-                <button class="copy-btn" onclick="copyText('base64Output')">Copy Result</button>
-            </div>
-            <textarea id="base64Output" readonly placeholder="Encoded/Decoded result will appear here"></textarea>
-        </div>
         </div>
 
         <!-- WHOIS Search Tool -->
         <div class="tool-card">
-            <div class="tool-header">
-                <div>
-                    <h3>WHOIS Search</h3>
-                    <p class="tool-description">Search URL or IP on WHOIS</p>
-                </div>
-                <span class="expand-icon">▼</span>
-            </div>
+            <h3>WHOIS Search</h3>
+            <p class="tool-description">Search URL or IP on WHOIS</p>
             <div class="tool-content">
                 <textarea id="whoisInput" placeholder="Enter IP or domain"></textarea>
                 <div class="button-group">
@@ -460,332 +162,11 @@
         </div>
     </div>
     
-    <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #666;">
+    <footer>
         <p>Code generated by prompting Claude/ChatGPT with slight modifications by me.</p>
         <p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="">Report a bug</a> 🐛</p>
     </footer>
-    <script>
-        $(document).ready(function() {
-            // Initialize collapse state based on localStorage
-            const isCollapsed = localStorage.getItem('collapseAll') === 'true';
-            $('#toggleAll').prop('checked', !isCollapsed); // Inverse because checked means expanded
-            
-            if (isCollapsed) {
-                $('.tool-card').removeClass('expanded');
-                $('.tool-content').hide();
-                $('.expand-icon').css('transform', 'rotate(0deg)');
-            } else {
-                $('.tool-card').addClass('expanded');
-                $('.tool-content').show();
-                $('.expand-icon').css('transform', 'rotate(180deg)');
-            }
-            
-            // Initialize dark mode based on localStorage
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                $('#darkModeToggle').prop('checked', true);
-            }
-        });
 
-        // Card Toggle Functionality
-        $('.tool-header').click(function(e) {
-            const toolCard = $(this).parent();
-            const toolContent = $(this).next('.tool-content');
-            const expandIcon = $(this).find('.expand-icon');
-            
-            toolCard.toggleClass('expanded');
-            toolContent.slideToggle();
-            
-            if (toolCard.hasClass('expanded')) {
-                expandIcon.css('transform', 'rotate(180deg)');
-            } else {
-                expandIcon.css('transform', 'rotate(0deg)');
-            }
-            
-            // Check if all cards are expanded or collapsed and update toggle accordingly
-            const allCards = $('.tool-card').length;
-            const expandedCards = $('.tool-card.expanded').length;
-            $('#toggleAll').prop('checked', expandedCards === allCards);
-            localStorage.setItem('collapseAll', expandedCards !== allCards);
-        });
-
-        // Expand/Collapse Toggle Functionality
-        $('#toggleAll').change(function() {
-            const isChecked = $(this).prop('checked');
-            const allToolCards = $('.tool-card');
-            const allExpandIcons = $('.expand-icon');
-            
-            if (isChecked) {
-                allToolCards.addClass('expanded');
-                $('.tool-content').slideDown();
-                allExpandIcons.css('transform', 'rotate(180deg)');
-            } else {
-                allToolCards.removeClass('expanded');
-                $('.tool-content').slideUp();
-                allExpandIcons.css('transform', 'rotate(0deg)');
-            }
-            
-            localStorage.setItem('collapseAll', !isChecked);
-        });
-
-        // Dark Mode Toggle Functionality
-        $('#darkModeToggle').change(function() {
-            if ($(this).is(':checked')) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('darkMode', 'true');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('darkMode', 'false');
-            }
-        });
-
-        function formatText() {
-            const input = document.getElementById('textInput').value;
-            // Split the text only by commas or new lines
-            const text = input.split(/[\n,]+/).filter(text => text.trim());
-            // Join back the words, wrapping each in quotes and joining with a comma
-            const formatted = text.map(text => `"${text.trim()}"`).join(', ');
-            document.getElementById('textOutput').value = formatted;
-        }
-
-        // New defang/refang functions
-        function defang() {
-            const input = document.getElementById('fangInput').value;
-            let output = input
-                // Replace http with hxxp
-                .replace(/http/gi, 'hxxp')
-                // Replace dots in URLs/IPs with [.]
-                .replace(/\./g, '[.]')
-                // Replace @ in URLs with [@]
-                .replace(/@/g, '[@]')
-                // Replace : with [:]
-                .replace(/:/g, '[:]');
-            
-            document.getElementById('fangOutput').value = output;
-        }
-
-        function refang() {
-            const input = document.getElementById('fangInput').value;
-            let output = input
-                // Replace hxxp with http
-                .replace(/hxxp/gi, 'http')
-                // Remove brackets around dots
-                .replace(/\[\.\]/g, '.')
-                // Remove brackets around @
-                .replace(/\[@\]/g, '@')
-                // Remove brackets around colons
-                .replace(/\[:\]/g, ':');
-            
-            document.getElementById('fangOutput').value = output;
-        }
-
-        function copyText(elementId) {
-            const element = document.getElementById(elementId);
-            element.select();
-            document.execCommand('copy');
-            
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = 'Copied!';
-            setTimeout(() => {
-                button.textContent = originalText;
-            }, 1000);
-        }
-
-        function openVirusTotal() {
-            const input = document.getElementById("threatInput").value;
-            const items = input.split(/\r?\n/).filter((item) => item.trim());
-
-            if (items.length === 0) {
-                alert("Please enter at least one IP or domain.");
-                return;
-            }
-
-            const url = `https://www.virustotal.com/gui/search/${encodeURIComponent(items[0])}`;
-            window.open(url, "_blank");
-        }
-
-        function openAbuseIPDB() {
-            const input = document.getElementById("threatInput").value;
-            const items = input.split(/\r?\n/).filter((item) => item.trim());
-
-            if (items.length === 0) {
-                alert("Please enter at least one IP or domain.");
-                return;
-            }
-
-            const url = `https://www.abuseipdb.com/check/${encodeURIComponent(items[0])}`;
-            window.open(url, "_blank");
-        }
-
-        function searchThreatIntel() {
-            const input = document.getElementById('threatInput').value;
-            const items = input.split(/\r?\n/).filter(item => item.trim());
-            let output = '';
-
-            items.forEach(item => {
-                const trimmedItem = item.trim();
-                if (trimmedItem) {
-                    output += `https://www.virustotal.com/gui/search/${encodeURIComponent(trimmedItem)}\n`;
-                    output += `https://www.abuseipdb.com/check/${encodeURIComponent(trimmedItem)}\n\n`;
-                }
-            });
-
-            document.getElementById('threatOutput').value = output.trim();
-        }
-
-        function decodeSafelinks() {
-            const input = document.getElementById("safelinkInput").value;
-            let decodedOutput = [];
-
-            // Split input by new lines or commas, trim any leading/trailing spaces
-            const safelinks = input.split(/[\n,]+/).map(item => item.trim()).filter(item => item.length > 0);
-
-            if (safelinks.length === 0) {
-                decodedOutput = ["Error: No Safelinks to decode."];
-            } else {
-                safelinks.forEach(safelink => {
-                    // Regular expression to extract the 'url' parameter from the Safelink
-                    const safelinkRegex = /url=([^&]+)/i;
-                    const match = safelinkRegex.exec(safelink);
-
-                    if (match && match[1]) {
-                        let encodedUrl = match[1];
-                        let decodedUrl = encodedUrl;
-
-                        // First, attempt to decode the URL-encoded string (e.g., '%20' -> space)
-                        try {
-                            decodedUrl = decodeURIComponent(encodedUrl);
-
-                            // If the URL looks like it starts with 'http', it's decoded
-                            if (decodedUrl && decodedUrl.indexOf('http') === 0) {
-                                decodedOutput.push(decodedUrl);
-                            } else {
-                                // Otherwise, fallback to base64 decoding (if needed)
-                                try {
-                                    decodedUrl = atob(encodedUrl); // Decode base64
-                                    decodedUrl = decodeURIComponent(decodedUrl); // Decode any further URL encoding if present
-                                    decodedOutput.push(decodedUrl);
-                                } catch (e) {
-                                    decodedOutput.push("Error: Unable to decode Safelink URL.");
-                                }
-                            }
-                        } catch (e) {
-                            decodedOutput.push("Error: Unable to decode URL-encoded string.");
-                        }
-                    } else {
-                        decodedOutput.push("Error: No 'url' parameter found in the Safelink.");
-                    }
-                });
-            }
-
-            // Get the format of the input: check if it's separated by commas or new lines
-            const delimiter = input.includes(',') ? ',' : '\n';
-
-            // If delimiter is comma, add a space after each comma in the output
-            if (delimiter === ',') {
-                document.getElementById("safelinkOutput").value = decodedOutput.join(', ');
-            } else {
-                document.getElementById("safelinkOutput").value = decodedOutput.join('\n');
-            }
-        }
-
-        //QR Decode from File
-        async function decodeQRFromFile() {
-            const fileInput = document.getElementById('qrFileInput');
-            const output = document.getElementById('qrDecodedOutput');
-
-            if (fileInput.files.length === 0) {
-                alert("Please select an image file.");
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const img = new Image();
-            img.src = URL.createObjectURL(file);
-
-            img.onload = () => processQRImage(img, output);
-        }
-
-        //QR Decode from URL
-        async function decodeQRFromUrl() {
-            const imageUrl = document.getElementById('qrImageUrl').value.trim();
-            const output = document.getElementById('qrDecodedOutput');
-
-            if (!imageUrl) {
-                alert("Please enter a valid image URL.");
-                return;
-            }
-
-            const img = new Image();
-            img.crossOrigin = "Anonymous"; // Ensure CORS handling for external images
-            img.src = imageUrl;
-
-            img.onload = () => processQRImage(img, output);
-        }
-
-        function processQRImage(img, outputElement) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-
-            canvas.width = img.width;
-            canvas.height = img.height;
-            context.drawImage(img, 0, 0, img.width, img.height);
-
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
-
-            if (qrCode) {
-                outputElement.value = qrCode.data;
-            } else {
-                outputElement.value = "No QR code detected.";
-            }
-        }
-        
-        function resetQRDecoder() {
-            document.getElementById('qrFileInput').value = ""; // Clear the file input
-            document.getElementById('qrImageUrl').value = "";  // Clear the URL input
-            document.getElementById('qrDecodedOutput').value = ""; // Clear the decoded output
-        }
-
-        // Encode Text to Base64
-        function encodeBase64() {
-            const input = document.getElementById('base64Input').value.trim();
-            try {
-                const encoded = btoa(input); // Encode to Base64
-                document.getElementById('base64Output').value = encoded;
-            } catch (error) {
-                document.getElementById('base64Output').value = 'Invalid input for Base64 encoding';
-            }
-        }
-
-        // Decode Base64 Input
-        function decodeBase64() {
-            const input = document.getElementById('base64Input').value.trim();
-            try {
-                const decoded = atob(input); // Decode Base64
-                document.getElementById('base64Output').value = decoded;
-            } catch (error) {
-                document.getElementById('base64Output').value = 'Invalid Base64 input';
-            }
-        }
-
-        // WHOIS
-        function openWhois() {
-            const input = document.getElementById("whoisInput").value;
-            const url = `https://www.whois.com/whois/${encodeURIComponent(input)}`;
-            window.open(url, "_blank");
-        }
-
-        function generateWhoisURL() {
-            const input = document.getElementById('whoisInput').value;
-            const items = input.split(/\r?\n/).filter(item => item.trim());
-            let output = '';
-            output += `https://www.whois.com/whois/${encodeURIComponent(input)}\n`;
-
-
-            document.getElementById('whoisOutput').value = output.trim();
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
