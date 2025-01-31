@@ -1,12 +1,12 @@
 :root {
-    --bg-color: #f0f2f5;  /* Softer background */
+    --bg-color: #f0f2f5;
     --text-color: #2d2d2d;
     --card-bg: #ffffff;
     --border-color: #e0e3e7;
     --hover-bg: #f3f4f6;
     --code-bg: #1a1a1a;
     --code-color: #ffffff;
-    --button-primary: #3b82f6;  /* Softer blue */
+    --button-primary: #3b82f6;
     --button-hover: #2563eb;
 }
 
@@ -91,9 +91,8 @@ pre {
     font-size: 0.875rem;
 }
 
-/* Documentation area */
 .bg-gray-50 {
-    background-color: #edf2f7;  /* Softer gray for light mode */
+    background-color: #edf2f7;
     border: 1px solid var(--border-color);
     border-radius: 4px;
 }
@@ -102,7 +101,6 @@ pre {
     background-color: #363636;
 }
 
-/* Form elements */
 input, textarea {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -118,6 +116,19 @@ input:focus, textarea:focus {
 }
 
 /* Prism syntax highlighting overrides */
+.dark pre[class*="language-"],
+.dark code[class*="language-"] {
+    background: var(--code-bg);
+    color: #f8f8f2;
+}
+
+.dark .token.comment,
+.dark .token.prolog,
+.dark .token.doctype,
+.dark .token.cdata {
+    color: #6272a4;
+}
+
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
     background: var(--code-bg);
@@ -131,12 +142,10 @@ pre[class*="language-"] {
     background: transparent;
 }
 
-/* Active edit button state */
 .dark .button-outline.bg-gray-200 {
     background-color: var(--hover-bg);
 }
 
-/* Transitions */
 .card,
 .button,
 input,
