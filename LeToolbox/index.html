@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeToolbox 🧰</title>
-    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=92oZwSFODREJ&format=png&color=000000">
+    <title>LeToolbox</title>
+    <link rel="shortcut icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=5Fq9EkIgnDeR&format=png&color=000000">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>LeToolbox 🧰</h1>
+        <h1>LeToolbox</h1>
         <!-- Dark Mode Toggle -->
         <div class="toggle-container">
             <svg class="feather feather-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -35,6 +35,8 @@
 
     <!-- Tool Container -->
     <div class="tools-container">
+        <!-- STRING MANIPULATION TOOLS -->
+        <h2 style="grid-column: 1 / -1; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin: 20px 0;">String Manipulation Tools</h2>
         <!-- Text Formatter Tool -->
         <div class="tool-card">
             <h3>Text Formatter</h3>
@@ -48,7 +50,6 @@
                 <textarea id="textOutput" readonly placeholder="Formatted result(s) will appear here"></textarea>
             </div>
         </div>
-
         <!-- Defang/Refang Tool -->
         <div class="tool-card">
             <h3>Defang and Fang</h3>
@@ -63,12 +64,59 @@
                 <textarea id="fangOutput" readonly placeholder="Defanged or refanged result(s) will appear here"></textarea>
             </div>
         </div>
+        <!-- Base64 Decoder Tool -->
+        <div class="tool-card">
+            <h3>Base64 Encoder/Decoder</h3>
+            <p class="tool-description">Base64 encode a string or decode a Base64-encoded string into plain text.</p>
+            <div class="tool-content">
+                <textarea id="base64Input" placeholder="Enter Base64-encoded string here"></textarea>
+                <div class="button-group">
+                    <button onclick="encodeBase64()">Encode</button>
+                    <button onclick="decodeBase64()">Decode</button>
+                    <button class="copy-btn" onclick="copyText('base64Output')">Copy Result</button>
+                </div>
+                <textarea id="base64Output" readonly placeholder="Encoded/Decoded result will appear here"></textarea>
+            </div>
+        </div>
+        <!-- Regex Capture Tool -->
+        <div class="tool-card">
+            <div class="tool-header">
+                <div>
+                    <h3>Regex Capture</h3>
+                    <p class="tool-description">Extract patterns from text using regex with one of the presets or a custom pattern</p>
+                </div>
+            </div>
+            <div class="tool-content">
+                <textarea id="regexInput" placeholder="Paste your text here"></textarea>
+                <div class="regex-controls">
+                    <select id="regexPreset" onchange="updateRegexPattern()">
+                        <option value="custom">Custom Pattern</option>
+                        <option value="ipv4">IPv4 Addresses</option>
+                        <option value="email">Email Addresses</option>
+                        <option value="url">URLs</option>
+                        <option value="md5">MD5 Hashes</option>
+                        <option value="sha256">SHA256 Hashes</option>
+                        <option value="base64">Base64 Strings</option>
+                    </select>
+                    <input type="text" id="customRegex" placeholder="Enter custom regex pattern">
+                </div>
+                <div class="button-group">
+                    <button onclick="captureMatches()">Capture</button>
+                    <button onclick="resetRegexTool()">Reset</button>
+                    <button class="copy-btn" onclick="copyText('regexOutput')">Copy Result</button>
+                </div>
+                <textarea id="regexOutput" readonly placeholder="Captured matches will appear here"></textarea>
+            </div>
+        </div>
 
+        <!-- OSINT TOOLS -->
+        <h2 style="grid-column: 1 / -1; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin: 20px 0;">OSINT Tools</h2>
         <!-- VirusTotal and AbuseIPDB Search Tool -->
         <div class="tool-card">
-            <h3>Threat Intelligence Search</h3>
+            <h3>VirusTotal and AbuseIPDB Search</h3>
             <p class="tool-description">Search IPs/Domains on VirusTotal and AbuseIPDB</p>
             <p class="tool-description">Open buttons <b>ONLY</b> work <b>ONE</b> IP at a time</p>
+            <p class="tool-description"><b>TIP</b>: Hold Ctrl/Cmd while clicking to open in background tab</p>
             <div class="tool-content">
                 <textarea id="threatInput" placeholder="Enter IP(s) or domain(s) (one per line)"></textarea>
                 <div class="threat-buttons">
@@ -84,7 +132,20 @@
                 <textarea id="threatOutput" readonly placeholder="Generated search URL(s) will appear here"></textarea>
             </div>
         </div>
-
+        <!-- WHOIS Search Tool -->
+        <div class="tool-card">
+            <h3>WHOIS Search</h3>
+            <p class="tool-description">Search URL or IP on WHOIS</p>
+            <div class="tool-content">
+                <textarea id="whoisInput" placeholder="Enter IP or domain"></textarea>
+                <div class="button-group">
+                    <button onclick="generateWhoisURL()">Generate URL</button>
+                    <button onclick="openWhois()">Open WHOIS</button>
+                    <button class="copy-btn" onclick="copyText('whoisOutput')">Copy Result</button>
+                </div>
+                <textarea id="whoisOutput" readonly placeholder="Generated whois URL will appear here"></textarea>
+            </div>
+        </div>
         <!-- Safelink Decoder Tool -->
         <div class="tool-card">
             <h3>Safelink Decoder</h3>
@@ -99,65 +160,26 @@
                 <textarea id="safelinkOutput" readonly placeholder="Decoded URL(s) will appear here"></textarea>
             </div>
         </div>
-
         <!-- QR Decoder Tool -->
         <div class="tool-card">
             <h3>QR Decoder</h3>
             <p class="tool-description">Decode QR codes from an uploaded image or an image URL.</p>
             <div class="tool-content">
-                <!-- Image Upload Section - Updated styles -->
-                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
-                    <label for="qrFileInput" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Upload an Image:</label>
-                    <input type="file" id="qrFileInput" accept="image/*" style="margin-bottom: 10px; color: var(--text-color);" />
-                    <button onclick="decodeQRFromFile()" style="margin-right: 10px;">Decode Uploaded Image</button>
+                <!-- Image Upload Section -->
+                <div class="qr-section">
+                    <label for="qrFileInput">Upload an Image:</label>
+                    <input type="file" id="qrFileInput" accept="image/*" />
+                    <button onclick="decodeQRFromFile()">Decode Uploaded Image</button>
                 </div>
-                <!-- URL Input Section - Updated styles -->
-                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--card-bg); transition: background-color 0.3s ease, border-color 0.3s ease;">
-                    <label for="qrImageUrl" style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--text-color);">Paste an Image URL:</label>
-                    <input type="text" id="qrImageUrl" placeholder="Paste an image URL" 
-                        style="width: calc(100% - 22px); 
-                                margin-bottom: 10px; 
-                                padding: 8px; 
-                                border: 1px solid var(--border-color); 
-                                border-radius: 4px; 
-                                background-color: var(--card-bg); 
-                                color: var(--text-color);
-                                transition: background-color 0.3s ease, border-color 0.3s ease;" />
-                    <button onclick="decodeQRFromUrl()" style="margin-right: 10px;">Decode from URL</button>
+                <!-- URL Input Section -->
+                <div class="qr-section">
+                    <label for="qrImageUrl">Paste an Image URL:</label>
+                    <input type="text" id="qrImageUrl" placeholder="Paste an image URL" />
+                    <button onclick="decodeQRFromUrl()">Decode from URL</button>
                 </div>
                 <textarea id="qrDecodedOutput" readonly placeholder="Decoded URL will appear here"></textarea>
                 <button onclick="resetQRDecoder()">Reset</button>
                 <button class="copy-btn" onclick="copyText('qrDecodedOutput')">Copy Result</button>
-            </div>
-        </div>
-        
-        <!-- Base64 Decoder Tool -->
-        <div class="tool-card">
-            <h3>Base64 Encoder/Decoder</h3>
-            <p class="tool-description">Base64 encode a string or decode a Base64-encoded string into plain text.</p>
-            <div class="tool-content">
-                <textarea id="base64Input" placeholder="Enter Base64-encoded string here"></textarea>
-                <div class="button-group">
-                    <button onclick="encodeBase64()">Encode</button>
-                    <button onclick="decodeBase64()">Decode</button>
-                    <button class="copy-btn" onclick="copyText('base64Output')">Copy Result</button>
-                </div>
-                <textarea id="base64Output" readonly placeholder="Encoded/Decoded result will appear here"></textarea>
-            </div>
-        </div>
-
-        <!-- WHOIS Search Tool -->
-        <div class="tool-card">
-            <h3>WHOIS Search</h3>
-            <p class="tool-description">Search URL or IP on WHOIS</p>
-            <div class="tool-content">
-                <textarea id="whoisInput" placeholder="Enter IP or domain"></textarea>
-                <div class="button-group">
-                    <button onclick="generateWhoisURL()">Generate URL</button>
-                    <button onclick="openWhois()">Open WHOIS</button>
-                    <button class="copy-btn" onclick="copyText('whoisOutput')">Copy Result</button>
-                </div>
-                <textarea id="whoisOutput" readonly placeholder="Generated whois URL will appear here"></textarea>
             </div>
         </div>
     </div>
