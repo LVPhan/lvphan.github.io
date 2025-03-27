@@ -36,3 +36,12 @@ function calculateTotal() {
   
 // Add event listener for input field to calculate the total as the user types
 document.getElementById('bidAmount').addEventListener('input', calculateTotal);
+
+// Prevent zooming on input focus and reset zoom on blur
+document.getElementById('bidAmount').addEventListener('focus', function () {
+  document.body.style.zoom = "1";  // Prevent zooming when input is focused
+});
+
+document.getElementById('bidAmount').addEventListener('blur', function () {
+  document.body.style.zoom = "1";  // Reset zoom when input is blurred
+});
