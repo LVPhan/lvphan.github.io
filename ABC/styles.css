@@ -1,5 +1,5 @@
-/* General Styles */
-body {
+  /* General Styles */
+  body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -7,8 +7,15 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #f4f4f9;
+    overflow-x: hidden;
   }
-  
+
+  html, body {
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll; /* Prevents mobile page jump */
+  }
+
   .container {
     text-align: center;
     background-color: white;
@@ -19,7 +26,11 @@ body {
     max-width: 400px; /* Max width for larger screens */
     box-sizing: border-box; /* Ensure padding doesn't cause overflow */
   }
-  
+
+  input:focus {
+    outline: none; /* Remove the default outline on focus */
+  }
+
   h1 {
     font-size: 1.5rem; /* Adjust title size */
     margin-bottom: 10px;
@@ -61,6 +72,18 @@ body {
     font-size: 1.2rem; /* Slightly larger font for easier input */
     text-align: right; /* Align the text to the right */
     height: 50px; /* Increased height for better mobile touch target */
+  }
+
+  /* Prevent zooming on input fields */
+  input:focus {
+    outline: none;
+  }
+
+  /* Prevent page resize on mobile */
+  html, body {
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    -webkit-overflow-scrolling: touch;
   }
   
   button {
