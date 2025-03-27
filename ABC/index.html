@@ -1,0 +1,33 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Bid Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Auction Bid Calculator</h1>
+      <input type="number" id="bidAmount" placeholder="Enter your bid" required />
+      
+      <button onclick="calculateTotal()">Calculate Total</button>
+      
+      <h3 id="result">Total Cost: $0.00</h3>
+    </div>
+    
+    <script src="app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+      }
+    </script>
+  </body>
+  
