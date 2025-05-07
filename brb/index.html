@@ -23,7 +23,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         .add-pokemon {
@@ -173,6 +173,58 @@
             text-align: center;
             font-size: 1.2rem;
         }
+        .manual-adjustments {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        .manual-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .manual-row:last-child {
+            margin-bottom: 0;
+        }
+        .adjust-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .adjust-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .adjust-btn {
+            padding: 4px 10px;
+            font-size: 14px;
+            background-color: #2196F3;
+            margin: 0;
+        }
+        .adjust-btn:hover {
+            background-color: #0b7dda;
+        }
+        .time-adjust {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .time-input {
+            width: 50px;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .time-unit {
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
         .ko-btn {
             padding: 4px 10px;
             font-size: 14px;
@@ -196,7 +248,7 @@
         </div>
         
         <div class="add-pokemon">
-            <h2>Add a New Pokémon</h2>
+            <h2>Add New Pokémon</h2>
             <div>
                 <input type="text" id="pokemon-name" placeholder="Enter name">
                 <button class="btn" id="add-pokemon-btn">Add Pokémon</button>
@@ -220,7 +272,7 @@
         //     '🐰', '🐻', '🦎', '🐙', '🦇', '🦋', '🐝', '🐞', '🦀'
         // ];
 
-            const pokemonEmojis = [
+        const pokemonEmojis = [
             '<img src="https://cdn0.iconfinder.com/data/icons/pokemon-go-vol-2/135/_pikachu-128.png" width="50" height="50">',
             '<img src="https://cdn0.iconfinder.com/data/icons/pokemon-go-vol-2/135/_zubat-128.png" width="50" height="50">', 
             '<img src="https://cdn0.iconfinder.com/data/icons/pokemon-go-vol-2/135/_snorlax-128.png" width="50" height="50">', 
@@ -467,6 +519,34 @@
                 }
             });
         }
+        
+        // Adjust BRB count manually
+        function adjustBRBs(id, amount) {
+            const pokemon = state.pokemons.find(p => p.id === id);
+            if (pokemon) {
+                pokemon.brbCount = Math.max(0, pokemon.brbCount + amount);
+                saveToLocalStorage();
+                renderPokemonList();
+            }
+        }
+
+        // Add time manually
+        function addTime(id) {
+            const pokemon = state.pokemons.find(p => p.id === id);
+            if (pokemon) {
+                const timeValueInput = document.getElementById(`time-value-${id}`);
+                const timeUnitSelect = document.getElementById(`time-unit-${id}`);
+                
+                const value = parseInt(timeValueInput.value, 10) || 0;
+                const unit = parseInt(timeUnitSelect.value, 10) || 1000;
+                
+                if (value > 0) {
+                    pokemon.totalTime += value * unit;
+                    saveToLocalStorage();
+                    renderPokemonList();
+                }
+            }
+        }
 
         // Create Pokémon card HTML
         function createPokemonCard(pokemon) {
@@ -501,6 +581,27 @@
                         <button class="btn ko-btn" onclick="decrementKO('${pokemon.id}')">-</button>
                         <span class="ko-value">${pokemon.koCount}</span>
                         <button class="btn ko-btn" onclick="incrementKO('${pokemon.id}')">+</button>
+                    </div>
+                </div>
+                <div class="manual-adjustments">
+                    <div class="manual-row">
+                        <label>Add BRBs:</label>
+                        <div class="adjust-controls">
+                            <button class="btn adjust-btn" onclick="adjustBRBs('${pokemon.id}', -1)">-</button>
+                            <span class="adjust-value">${pokemon.brbCount}</span>
+                            <button class="btn adjust-btn" onclick="adjustBRBs('${pokemon.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="manual-row">
+                        <label>Add Time:</label>
+                        <div class="time-adjust">
+                            <input type="number" min="1" value="5" id="time-value-${pokemon.id}" class="time-input">
+                            <select id="time-unit-${pokemon.id}" class="time-unit">
+                                <option value="60000">min</option>
+                                <option value="1000">sec</option>
+                            </select>
+                            <button class="btn adjust-btn" onclick="addTime('${pokemon.id}')">Add</button>
+                        </div>
                     </div>
                 </div>
                 <div class="stats">
@@ -556,6 +657,8 @@
             window.removePokemon = removePokemon;
             window.incrementKO = incrementKO;
             window.decrementKO = decrementKO;
+            window.adjustBRBs = adjustBRBs;
+            window.addTime = addTime;
             
             // Start timer interval if we have Pokémon
             if (state.pokemons.length > 0) {
