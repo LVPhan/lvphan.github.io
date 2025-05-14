@@ -534,6 +534,8 @@
         function addTime(id) {
             const pokemon = state.pokemons.find(p => p.id === id);
             if (pokemon) {
+                pokemon.brbCount++
+
                 const timeValueInput = document.getElementById(`time-value-${id}`);
                 const timeUnitSelect = document.getElementById(`time-unit-${id}`);
                 
