@@ -1,0 +1,57 @@
+html{
+    background: black;
+    color: #008F11;
+    font-family: "VT323", serif;
+}
+
+#intro, #projects, #certs{
+    text-align: center;
+    margin-bottom: 50px;
+    /* background: white; */
+}
+
+/* Cert Section Related */
+#certs > img{
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+}
+
+/* Project Section Related */
+#proj1, #proj2, #proj3{
+    display:  inline-block;
+    height: 200px;
+    width: 500px;
+}
+
+#proj1 > p, #proj2 > p, #proj3 > p{
+    font-size: 20px;
+}
+
+/* General Tags */
+h1{
+    font-size: 100px;
+}
+
+h2{
+    font-size: 50px;
+    margin: 0px;
+}
+
+h3{
+    font-size: 25px;
+}
+
+p {
+    font-size: 20px;
+    margin-top: 0px;
+}
+
+a{
+    color:#008F11;
+}
+
+footer{
+    text-align: center;
+}
+/* General Tags */
