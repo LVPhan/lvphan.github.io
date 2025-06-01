@@ -13,7 +13,7 @@ function calculateTotal() {
   const buyerPremium = bidAmount * buyerPremiumRate;
   
   // Calculate sales tax
-  const salesTax = bidAmount * salesTaxRate;
+  const salesTax = buyerPremiumRate * salesTaxRate;
 
   // Calculate total cost
   const totalCost = bidAmount + buyerPremium + salesTax;
