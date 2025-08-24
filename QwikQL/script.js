@@ -413,119 +413,133 @@ const loadQueries = (searchTerm = '') => {
         const favoriteQueries = filteredQueries.filter(q => q.isFavorite);
         console.log(`Filtered queries count: ${filteredQueries.length}, Favorite queries count: ${favoriteQueries.length}`);
 
-        // Populate queryList
-        if (filteredQueries.length === 0 && activeTab === 'queries') {
-            queryList.innerHTML = `
-            <li class="text-center py-12">
-              <div class="empty-state text-4xl mb-4">${searchTerm ? '🔍' : '📝'}</div>
-              <p class="text-gray-500 dark:text-gray-400 font-medium">
-                ${searchTerm ? 'No matching queries' : 'No queries yet'}
-              </p>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                ${searchTerm ? 'Try a different search term' : 'Create your first KQL query!'}
-              </p>
-            </li>
-          `;
-        } else if (activeTab === 'queries') {
-            queryList.innerHTML = filteredQueries.map(query => {
-                const versionInfo = query.versions && query.versions.length > 0 ? 
-                    `<span class="text-xs text-purple-500 dark:text-purple-400 ml-2">v${query.versions[query.versions.length - 1].version}</span>` : 
-                    '<span class="text-xs text-gray-400 ml-2">v1.0</span>';
-                
-                return `
-                <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
-                  <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center">
-                      <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
-                      ${versionInfo}
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
-                              onclick="toggleFavorite(${query.id}); event.stopPropagation();"
-                              aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-                        <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                        </svg>
-                      </button>
-                      <div class="flex items-center text-xs text-gray-500">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        ${new Date(query.id).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex flex-wrap gap-1 mb-2">
-                    ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
-                      <span class="modern-tag ${getTagColor(tag)}">
-                        ${tag}
-                      </span>
-                    `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
-                  </div>
-                  <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                    ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
-                  </p>
-                </li>
-              `;
-            }).join('');
-        }
+// Populate queryList
+    if (filteredQueries.length === 0 && activeTab === 'queries') {
+        queryList.innerHTML = `
+        <li class="text-center py-12">
+        <div class="empty-state text-4xl mb-4">${searchTerm ? '🔍' : '📝'}</div>
+        <p class="text-gray-500 dark:text-gray-400 font-medium">
+            ${searchTerm ? 'No matching queries' : 'No queries yet'}
+        </p>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            ${searchTerm ? 'Try a different search term' : 'Create your first KQL query!'}
+        </p>
+        </li>
+    `;
+    } else if (activeTab === 'queries') {
+        queryList.innerHTML = filteredQueries.map(query => {
+            const versionInfo = query.versions && query.versions.length > 0 ? 
+                `<span class="text-xs text-purple-500 dark:text-purple-400">${'v' + query.versions[query.versions.length - 1].version}</span>` : 
+                '<span class="text-xs text-gray-400">v1.0</span>';
 
-        // Populate favoriteList
-        if (favoriteQueries.length === 0 && activeTab === 'favorites') {
-            favoriteList.innerHTML = `
-            <li class="text-center py-12">
-              <div class="empty-state text-4xl mb-4">${searchTerm ? '🔍' : '⭐'}</div>
-              <p class="text-gray-500 dark:text-gray-400 font-medium">
-                ${searchTerm ? 'No matching favorites' : 'No favorite queries yet'}
-              </p>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                ${searchTerm ? 'Try a different search term' : 'Mark some queries as favorites!'}
-              </p>
+            return `
+            <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
+            <div class="flex justify-between items-start mb-2">
+                <!-- Title + Version -->
+                <div class="flex items-center space-x-2 min-w-0 max-w-[calc(100%-115px)]">
+                <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1 truncate min-w-0">
+                    ${query.name}
+                </h3>
+                ${versionInfo}
+                </div>
+
+                <!-- Favorite + Date -->
+                <div class="flex items-center space-x-2">
+                <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
+                        onclick="toggleFavorite(${query.id}); event.stopPropagation();"
+                        aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                    <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                </button>
+                <div class="flex items-center text-xs text-gray-500">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    ${new Date(query.id).toLocaleDateString()}
+                </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-2">
+                ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
+                <span class="modern-tag ${getTagColor(tag)}">
+                    ${tag}
+                </span>
+                `).join('') : ''}
+            </div>
+
+            <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
+            </p>
             </li>
-          `;
-        } else if (activeTab === 'favorites') {
-            favoriteList.innerHTML = favoriteQueries.map(query => {
-                const versionInfo = query.versions && query.versions.length > 0 ? 
-                    `<span class="text-xs text-purple-500 dark:text-purple-400 ml-2">v${query.versions[query.versions.length - 1].version}</span>` : 
-                    '<span class="text-xs text-gray-400 ml-2">v1.0</span>';
-                
-                return `
-                <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
-                  <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center">
-                      <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
-                      ${versionInfo}
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
-                              onclick="toggleFavorite(${query.id}); event.stopPropagation();"
-                              aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-                        <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                        </svg>
-                      </button>
-                      <div class="flex items-center text-xs text-gray-500">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        ${new Date(query.id).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex flex-wrap gap-1 mb-2">
-                    ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
-                      <span class="modern-tag ${getTagColor(tag)}">
-                        ${tag}
-                      </span>
-                    `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
-                  </div>
-                  <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                    ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
-                  </p>
-                </li>
-              `;
-            }).join('');
-        }
+        `;
+        }).join('');
+    }
+
+    // Populate favoriteList
+    if (favoriteQueries.length === 0 && activeTab === 'favorites') {
+        favoriteList.innerHTML = `
+        <li class="text-center py-12">
+        <div class="empty-state text-4xl mb-4">${searchTerm ? '🔍' : '⭐'}</div>
+        <p class="text-gray-500 dark:text-gray-400 font-medium">
+            ${searchTerm ? 'No matching favorites' : 'No favorite queries yet'}
+        </p>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            ${searchTerm ? 'Try a different search term' : 'Mark some queries as favorites!'}
+        </p>
+        </li>
+    `;
+    } else if (activeTab === 'favorites') {
+        favoriteList.innerHTML = favoriteQueries.map(query => {
+            const versionInfo = query.versions && query.versions.length > 0 ? 
+                `<span class="text-xs text-purple-500 dark:text-purple-400">${'v' + query.versions[query.versions.length - 1].version}</span>` : 
+                '<span class="text-xs text-gray-400">v1.0</span>';
+
+            return `
+            <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
+            <div class="flex justify-between items-start mb-2">
+                <!-- Title + Version -->
+                <div class="flex items-center space-x-2 min-w-0">
+                <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1 truncate min-w-0">
+                    ${query.name}
+                </h3>
+                ${versionInfo}
+                </div>
+
+                <!-- Favorite + Date -->
+                <div class="flex items-center space-x-2">
+                <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
+                        onclick="toggleFavorite(${query.id}); event.stopPropagation();"
+                        aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                    <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                </button>
+                <div class="flex items-center text-xs text-gray-500">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    ${new Date(query.id).toLocaleDateString()}
+                </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-2">
+                ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
+                <span class="modern-tag ${getTagColor(tag)}">
+                    ${tag}
+                </span>
+                `).join('') : ''}
+            </div>
+
+            <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
+            </p>
+            </li>
+        `;
+        }).join('');
+    }
 
         // Toggle visibility
         queryList.classList.toggle('hidden', activeTab !== 'queries');
@@ -1057,3 +1071,4 @@ if (document.readyState === 'loading') {
     init();
     clearEditor();
 }
+
