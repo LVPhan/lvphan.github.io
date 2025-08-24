@@ -54,6 +54,7 @@ let queries = [];
 let selectedQueryId = null;
 let queryEditor = null;
 let activeTab = 'queries';
+let currentVersionIndex = null;
 
 // Tag color classes
 const tagColors = ['tag-blue', 'tag-green', 'tag-purple', 'tag-orange', 'tag-pink'];
@@ -104,8 +105,229 @@ const updateQueryCount = () => {
         }
         queryCountElement.textContent = queries.length;
         favoriteCountElement.textContent = queries.filter(q => q.isFavorite).length;
+
+        // keep Export button in sync
+        const exportBtn = document.getElementById('exportBtn');
+        if (exportBtn) {
+            exportBtn.disabled = queries.length === 0;
+        }
     } catch (error) {
         console.error('Error in updateQueryCount:', error);
+    }
+};
+
+// Version Control Functions
+const createNewVersion = (query, queryText, name, tags) => {
+    const timestamp = Date.now();
+    const version = {
+        id: timestamp,
+        query: queryText,
+        name: name,
+        tags: [...(tags || [])],
+        timestamp: timestamp,
+        version: query.versions ? query.versions.length + 1 : 1
+    };
+    
+    if (!query.versions) {
+        query.versions = [];
+    }
+    
+    query.versions.push(version);
+    query.currentVersion = version.id;
+    
+    return version;
+};
+
+const updateVersionDisplay = () => {
+    try {
+        const versionBadge = document.getElementById('versionBadge');
+        const versionHistoryBtn = document.getElementById('versionHistoryBtn');
+        const currentVersionSpan = document.getElementById('currentVersion');
+        
+        if (!versionBadge || !versionHistoryBtn || !currentVersionSpan) return;
+        
+        if (selectedQueryId) {
+            const query = queries.find(q => q.id === selectedQueryId);
+            if (query && query.versions && query.versions.length > 0) {
+                const currentVersion = query.versions.find(v => v.id === query.currentVersion) || query.versions[query.versions.length - 1];
+                currentVersionSpan.textContent = `v${currentVersion.version}`;
+                versionBadge.classList.remove('hidden');
+                versionHistoryBtn.classList.remove('hidden');
+            } else {
+                versionBadge.classList.add('hidden');
+                versionHistoryBtn.classList.add('hidden');
+            }
+        } else {
+            versionBadge.classList.add('hidden');
+            versionHistoryBtn.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error updating version display:', error);
+    }
+};
+
+const showVersionHistory = () => {
+    try {
+        if (!selectedQueryId) return;
+        
+        const query = queries.find(q => q.id === selectedQueryId);
+        if (!query || !query.versions) return;
+        
+        const modal = document.getElementById('versionModal');
+        const versionList = document.getElementById('versionList');
+        
+        if (!modal || !versionList) return;
+        
+        // Sort versions by timestamp (newest first)
+        const sortedVersions = [...query.versions].sort((a, b) => b.timestamp - a.timestamp);
+        
+        versionList.innerHTML = sortedVersions.map((version, index) => {
+            const isCurrentVersion = version.id === query.currentVersion;
+            const date = new Date(version.timestamp).toLocaleString();
+            
+            return `
+                <div class="version-item p-4 bg-gray-50 dark:bg-gray-700 rounded-lg ${isCurrentVersion ? 'current' : ''}" data-version-id="${version.id}">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="version-badge">
+                                v${version.version}
+                            </span>
+                            ${isCurrentVersion ? '<span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Current</span>' : ''}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${!isCurrentVersion ? `<button onclick="revertToVersion('${version.id}')" class="btn-secondary btn-xs flex inline-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                </svg>
+                                Revert
+                            </button>` : ''}
+                            <button onclick="viewVersion('${version.id}')" class="btn-secondary btn-xs flex inline-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <div class="flex items-center space-x-4">
+                            <span>📅 ${date}</span>
+                            <span>📝 ${version.name}</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 bg-gray-100 dark:bg-gray-600 p-2 rounded font-mono">
+                        ${version.query.substring(0, 100)}${version.query.length > 100 ? '...' : ''}
+                    </div>
+                    ${version.tags && version.tags.length > 0 ? `
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            ${version.tags.map(tag => `<span class="modern-tag ${getTagColor(tag)} text-xs">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('show');
+            modal.querySelector('.modal').classList.add('show');
+        }, 10);
+        
+    } catch (error) {
+        console.error('Error showing version history:', error);
+        showToast('toast-error', 'Failed to show version history');
+    }
+};
+
+const revertToVersion = (versionId) => {
+    try {
+        if (!selectedQueryId) return;
+        
+        const query = queries.find(q => q.id === selectedQueryId);
+        if (!query || !query.versions) return;
+        
+        const version = query.versions.find(v => v.id.toString() === versionId.toString());
+        if (!version) return;
+        
+        if (confirm(`Are you sure you want to revert to version ${version.version}? This will create a new version with the old content.`)) {
+            // Create a new version with the reverted content
+            createNewVersion(query, version.query, version.name, version.tags);
+            
+            // Update the current query data
+            query.name = version.name;
+            query.query = version.query;
+            query.tags = [...(version.tags || [])];
+            
+            // Save to localStorage
+            localStorage.setItem('kqlQueries', JSON.stringify(queries));
+            
+            // Update the UI
+            loadQuery(selectedQueryId);
+            loadQueries(document.getElementById('searchInput')?.value || '');
+            
+            // Close modal
+            closeVersionModal();
+            
+            showToast('toast-version', `Reverted to version ${version.version}!`);
+        }
+        
+    } catch (error) {
+        console.error('Error reverting to version:', error);
+        showToast('toast-error', 'Failed to revert to version');
+    }
+};
+
+const viewVersion = (versionId) => {
+    try {
+        if (!selectedQueryId) return;
+        
+        const query = queries.find(q => q.id === selectedQueryId);
+        if (!query || !query.versions) return;
+        
+        const version = query.versions.find(v => v.id.toString() === versionId.toString());
+        if (!version) return;
+        
+        // Temporarily load this version for viewing
+        const queryNameInput = document.getElementById('queryName');
+        if (queryNameInput) queryNameInput.value = version.name || '';
+        if (queryEditor) queryEditor.setValue(version.query || '');
+        renderTags(version.tags || []);
+        
+        // Update version display to show we're viewing an old version
+        const currentVersionSpan = document.getElementById('currentVersion');
+        if (currentVersionSpan) {
+            currentVersionSpan.textContent = `v${version.version} (Viewing)`;
+            currentVersionSpan.parentElement.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        }
+        
+        // Store current version index for reference
+        currentVersionIndex = query.versions.findIndex(v => v.id.toString() === versionId.toString());
+        
+        closeVersionModal();
+        
+        setTimeout(() => {
+            queryEditor.refresh();
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error viewing version:', error);
+        showToast('toast-error', 'Failed to view version');
+    }
+};
+
+const closeVersionModal = () => {
+    try {
+        const modal = document.getElementById('versionModal');
+        if (modal) {
+            modal.classList.remove('show');
+            modal.querySelector('.modal').classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    } catch (error) {
+        console.error('Error closing version modal:', error);
     }
 };
 
@@ -115,7 +337,7 @@ const initCodeMirror = () => {
         console.log('Initializing CodeMirror');
         const queryInput = document.getElementById('queryInput');
         if (!queryInput) throw new Error('queryInput element not found');
-        const currentTheme = localStorage.getItem('theme') === 'dark' ? 'material-darker' : 'default';
+        const currentTheme = localStorage.getItem('theme') === 'dark' ? 'material-darker' : 'material';
         queryEditor = CodeMirror(queryInput, {
             value: '',
             lineNumbers: true,
@@ -205,38 +427,47 @@ const loadQueries = (searchTerm = '') => {
             </li>
           `;
         } else if (activeTab === 'queries') {
-            queryList.innerHTML = filteredQueries.map(query => `
-            <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
-                <div class="flex items-center space-x-2">
-                  <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
-                          onclick="toggleFavorite(${query.id}); event.stopPropagation();"
-                          aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-                    <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                    </svg>
-                  </button>
-                  <div class="flex items-center text-xs text-gray-500">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    ${new Date(query.id).toLocaleDateString()}
+            queryList.innerHTML = filteredQueries.map(query => {
+                const versionInfo = query.versions && query.versions.length > 0 ? 
+                    `<span class="text-xs text-purple-500 dark:text-purple-400 ml-2">v${query.versions[query.versions.length - 1].version}</span>` : 
+                    '<span class="text-xs text-gray-400 ml-2">v1.0</span>';
+                
+                return `
+                <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center">
+                      <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
+                      ${versionInfo}
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
+                              onclick="toggleFavorite(${query.id}); event.stopPropagation();"
+                              aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                        <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                      </button>
+                      <div class="flex items-center text-xs text-gray-500">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ${new Date(query.id).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div class="flex flex-wrap gap-1 mb-2">
-                ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
-                  <span class="modern-tag ${getTagColor(tag)}">
-                    ${tag}
-                  </span>
-                `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
-              </div>
-              <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
-              </p>
-            </li>
-          `).join('');
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
+                      <span class="modern-tag ${getTagColor(tag)}">
+                        ${tag}
+                      </span>
+                    `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
+                  </div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                    ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
+                  </p>
+                </li>
+              `;
+            }).join('');
         }
 
         // Populate favoriteList
@@ -253,38 +484,47 @@ const loadQueries = (searchTerm = '') => {
             </li>
           `;
         } else if (activeTab === 'favorites') {
-            favoriteList.innerHTML = favoriteQueries.map(query => `
-            <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
-                <div class="flex items-center space-x-2">
-                  <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
-                          onclick="toggleFavorite(${query.id}); event.stopPropagation();"
-                          aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
-                    <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                    </svg>
-                  </button>
-                  <div class="flex items-center text-xs text-gray-500">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    ${new Date(query.id).toLocaleDateString()}
+            favoriteList.innerHTML = favoriteQueries.map(query => {
+                const versionInfo = query.versions && query.versions.length > 0 ? 
+                    `<span class="text-xs text-purple-500 dark:text-purple-400 ml-2">v${query.versions[query.versions.length - 1].version}</span>` : 
+                    '<span class="text-xs text-gray-400 ml-2">v1.0</span>';
+                
+                return `
+                <li class="query-item p-4 bg-gray-50 dark:bg-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 animate-fade-in" onclick="loadQuery(${query.id})">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center">
+                      <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-1">${query.name}</h3>
+                      ${versionInfo}
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <button class="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300"
+                              onclick="toggleFavorite(${query.id}); event.stopPropagation();"
+                              aria-label="${query.isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                        <svg class="w-4 h-4" fill="${query.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                      </button>
+                      <div class="flex items-center text-xs text-gray-500">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ${new Date(query.id).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div class="flex flex-wrap gap-1 mb-2">
-                ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
-                  <span class="modern-tag ${getTagColor(tag)}">
-                    ${tag}
-                  </span>
-                `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
-              </div>
-              <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
-              </p>
-            </li>
-          `).join('');
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    ${query.tags && query.tags.length > 0 ? query.tags.map(tag => `
+                      <span class="modern-tag ${getTagColor(tag)}">
+                        ${tag}
+                      </span>
+                    `).join('') : '<span class="text-xs text-gray-400 dark:text-gray-500">No tags</span>'}
+                  </div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                    ${query.query ? query.query.substring(0, 100) + (query.query.length > 100 ? '...' : '') : 'No query content'}
+                  </p>
+                </li>
+              `;
+            }).join('');
         }
 
         // Toggle visibility
@@ -298,7 +538,7 @@ const loadQueries = (searchTerm = '') => {
         const favoriteList = document.getElementById('favoriteList');
         const errorHtml = `
           <li class="text-center py-12">
-            <div class="empty-state text-6xl mb-4">⚠</div>
+            <div class="empty-state text-6xl mb-4">⚠️</div>
             <p class="text-gray-500 dark:text-gray-400 font-medium">Error loading queries</p>
             <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Please try refreshing the page</p>
           </li>
@@ -319,6 +559,7 @@ const loadQuery = (id) => {
         }
         console.log(`Loading query: ${JSON.stringify(query)}`);
         selectedQueryId = id;
+        currentVersionIndex = null; // Reset version index
 
         const queryNameInput = document.getElementById('queryName');
         const tagInput = document.getElementById('tagInput');
@@ -332,6 +573,15 @@ const loadQuery = (id) => {
         tagInput.value = '';
         renderTags(query.tags || []);
         deleteBtn.disabled = false;
+        copyBtn.disabled = false;
+
+        // Reset version display styling
+        const currentVersionSpan = document.getElementById('currentVersion');
+        if (currentVersionSpan && currentVersionSpan.parentElement) {
+            currentVersionSpan.parentElement.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
+        }
+
+        updateVersionDisplay();
 
         setTimeout(() => {
             queryEditor.refresh();
@@ -363,22 +613,26 @@ const renderTags = (tags) => {
         console.log('Rendering tags:', tags);
         const tagList = document.getElementById('tagList');
         if (!tagList) throw new Error('tagList element not found');
-        if (!tags || tags.length === 0) {
-            tagList.innerHTML = '<span class="text-xs text-gray-400 dark:text-gray-500 italic">No tags added</span>';
-            return;
+
+        if (tags && tags.length > 0) {
+            tagList.style.display = 'flex'; // Show the div
+            tagList.innerHTML = tags.map(tag => 
+                `<span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${getTagColor(tag)}">
+                    ${tag.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                    <button class="ml-2 opacity-70 hover:opacity-100 transition-opacity" 
+                            onclick="removeTag('${tag.replace(/'/g, "\\'").replace(/"/g, '&quot;') }')" 
+                            aria-label="Remove tag">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </span>`
+            ).join('');
+        } else {
+            tagList.style.display = 'none'; // Hide the div
+            tagList.innerHTML = '';
         }
-        tagList.innerHTML = tags.map(tag => `
-          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${getTagColor(tag)}">
-            ${tag.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-            <button class="ml-2 opacity-70 hover:opacity-100 transition-opacity" 
-                    onclick="removeTag('${tag.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" 
-                    aria-label="Remove tag">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </span>
-        `).join('');
+
     } catch (error) {
         console.error('Rendering tags failed:', error);
         showToast('toast-error', 'Failed to render tags');
@@ -434,6 +688,7 @@ const clearEditor = () => {
     try {
         console.log('Clearing editor');
         selectedQueryId = null;
+        currentVersionIndex = null;
         const queryNameInput = document.getElementById('queryName');
         const tagInput = document.getElementById('tagInput');
         const deleteBtn = document.getElementById('deleteBtn');
@@ -445,6 +700,8 @@ const clearEditor = () => {
         tagInput.value = '';
         renderTags([]);
         deleteBtn.disabled = true;
+        copyBtn.disabled = true;
+        updateVersionDisplay();
         setTimeout(() => {
             queryEditor.refresh();
             console.log('CodeMirror refreshed after clearing editor');
@@ -509,8 +766,6 @@ const setupEventListeners = () => {
                 const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
                 setTheme(newTheme);
             });
-        } else {
-            console.warn('themeToggle element not found');
         }
 
         // New query button
@@ -520,8 +775,6 @@ const setupEventListeners = () => {
                 console.log('New query button clicked');
                 clearEditor();
             });
-        } else {
-            console.warn('newQueryBtn element not found');
         }
 
         // Search input
@@ -531,8 +784,6 @@ const setupEventListeners = () => {
                 console.log(`Search input changed: ${e.target.value}`);
                 loadQueries(e.target.value);
             });
-        } else {
-            console.warn('searchInput element not found');
         }
 
         // Tab switching
@@ -554,9 +805,30 @@ const setupEventListeners = () => {
                 tabQueries.classList.remove('active-tab');
                 loadQueries(document.getElementById('searchInput')?.value || '');
             });
-        } else {
-            console.warn('Tab elements missing: tabQueries=', !!tabQueries, 'tabFavorites=', !!tabFavorites);
-            showToast('toast-error', 'Tab navigation not available');
+        }
+
+        // Version history button
+        const versionHistoryBtn = document.getElementById('versionHistoryBtn');
+        if (versionHistoryBtn) {
+            versionHistoryBtn.addEventListener('click', showVersionHistory);
+        }
+
+        // Close version modal
+        const closeVersionModalBtn = document.getElementById('closeVersionModal');
+        if (closeVersionModalBtn) {
+            closeVersionModalBtn.addEventListener('click', () => {
+                closeVersionModal();
+            });
+        }
+
+        // Close modal on backdrop click
+        const versionModal = document.getElementById('versionModal');
+        if (versionModal) {
+            versionModal.addEventListener('click', (e) => {
+                if (e.target === versionModal) {
+                    closeVersionModal();
+                }
+            });
         }
 
         // Tag input - add tags on Enter
@@ -569,8 +841,6 @@ const setupEventListeners = () => {
                     addTags();
                 }
             });
-        } else {
-            console.warn('tagInput element not found');
         }
 
         // Save query button
@@ -596,6 +866,20 @@ const setupEventListeners = () => {
                         // Update existing query
                         const query = queries.find(q => q.id === selectedQueryId);
                         if (!query) throw new Error('Query not found');
+                        
+                        // Check if content has changed to create a new version
+                        const hasChanged = query.name !== name || query.query !== queryText || 
+                            JSON.stringify(query.tags || []) !== JSON.stringify([...(query.tags || []), ...newTags.filter(tag => !(query.tags || []).includes(tag))]);
+                        
+                        if (hasChanged) {
+                            // Create new version
+                            const existingTags = query.tags || [];
+                            const uniqueNewTags = newTags.filter(tag => !existingTags.includes(tag));
+                            const allTags = [...existingTags, ...uniqueNewTags];
+                            
+                            createNewVersion(query, queryText, name, allTags);
+                        }
+                        
                         query.name = name;
                         query.query = queryText;
                         const existingTags = query.tags || [];
@@ -603,23 +887,33 @@ const setupEventListeners = () => {
                         query.tags = [...existingTags, ...uniqueNewTags];
                     } else {
                         // Create new query
-                        queries.push({
+                        const newQuery = {
                             id: Date.now(),
                             name,
                             query: queryText,
                             tags: newTags,
                             isFavorite: false
-                        });
+                        };
+                        
+                        // Create initial version
+                        createNewVersion(newQuery, queryText, name, newTags);
+                        
+                        queries.push(newQuery);
+                        selectedQueryId = newQuery.id;
+                        
                     }
 
                     localStorage.setItem('kqlQueries', JSON.stringify(queries));
                     document.getElementById('tagInput').value = '';
                     loadQueries(document.getElementById('searchInput')?.value || '');
+                    updateVersionDisplay();
                     showToast('toast-save');
 
                     if (selectedQueryId) {
                         const query = queries.find(q => q.id === selectedQueryId);
                         renderTags(query.tags || []);
+                        copyBtn.disabled = false;
+                        deleteBtn.disabled = false;
                     } else {
                         renderTags([]);
                     }
@@ -628,8 +922,6 @@ const setupEventListeners = () => {
                     showToast('toast-error', 'Failed to save query');
                 }
             });
-        } else {
-            console.warn('saveQueryBtn element not found');
         }
 
         // Copy button
@@ -652,8 +944,6 @@ const setupEventListeners = () => {
                     showToast('toast-copy');
                 }
             });
-        } else {
-            console.warn('copyBtn element not found');
         }
 
         // Delete button
@@ -674,8 +964,6 @@ const setupEventListeners = () => {
                     }
                 }
             });
-        } else {
-            console.warn('deleteBtn element not found');
         }
 
         // Export button
@@ -699,8 +987,6 @@ const setupEventListeners = () => {
                     showToast('toast-error', 'Failed to export queries');
                 }
             });
-        } else {
-            console.warn('exportBtn element not found');
         }
 
         // Import button
@@ -723,7 +1009,9 @@ const setupEventListeners = () => {
                             if (Array.isArray(importedQueries)) {
                                 queries = importedQueries.map(q => ({
                                     ...q,
-                                    isFavorite: q.isFavorite || false
+                                    isFavorite: q.isFavorite || false,
+                                    versions: q.versions || [],
+                                    currentVersion: q.currentVersion || null
                                 }));
                                 localStorage.setItem('kqlQueries', JSON.stringify(queries));
                                 loadQueries(document.getElementById('searchInput')?.value || '');
@@ -740,8 +1028,6 @@ const setupEventListeners = () => {
                     reader.readAsText(file);
                 }
             });
-        } else {
-            console.warn('Import elements missing: importBtn=', !!importBtn, 'importInput=', !!importInput);
         }
 
         console.log('Event listeners setup complete');
@@ -755,14 +1041,19 @@ const setupEventListeners = () => {
 window.loadQuery = loadQuery;
 window.removeTag = removeTag;
 window.toggleFavorite = toggleFavorite;
+window.revertToVersion = revertToVersion;
+window.viewVersion = viewVersion;
+window.closeVersionModal = closeVersionModal;
 
 // Initialize when DOM is loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM content loaded, starting init');
         init();
+        clearEditor();
     });
 } else {
     console.log('DOM already loaded, starting init');
     init();
+    clearEditor();
 }
