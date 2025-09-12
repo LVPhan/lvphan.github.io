@@ -178,6 +178,10 @@
             font-size: 1.2rem;
         }
         
+        .spacer-row {
+            display: flex;
+        }
+        
         @media (max-width: 768px) {
             .calculators {
                 grid-template-columns: 1fr;
@@ -201,6 +205,10 @@
                 width: 50px;
                 height: 50px;
                 font-size: 11px;
+            }
+            
+            .spacer-row {
+                display: none;
             }
         }
     </style>
@@ -226,7 +234,7 @@
                 </div>
                 
                 <div class="calculation-row">
-                    <span class="label">Winning Bid:</span>
+                    <span class="label">Bid:</span>
                     <span class="value" id="nellis-bid">$0.00</span>
                 </div>
                 
@@ -235,7 +243,12 @@
                     <span class="value" id="nellis-premium">$0.00</span>
                 </div>
 
-                <div class="calculation-row">
+                <div class="calculation-row spacer-row">
+                    <span class="label"></span>
+                    <span class="value"></span>
+                </div>
+
+                <div class="calculation-row spacer-row">
                     <span class="label"></span>
                     <span class="value"></span>
                 </div>
@@ -248,11 +261,6 @@
                 <div class="calculation-row">
                     <span class="label">Sales Tax (8.375%):</span>
                     <span class="value" id="nellis-tax">$0.00</span>
-                </div>
-                
-                <div class="calculation-row">
-                    <span class="label"></span>
-                    <span class="value"></span>
                 </div>
                 
                 <div class="calculation-row">
@@ -298,6 +306,7 @@
                 </div>
             </div>
         </div>
+    </div>
     
     <script>
         function formatCurrency(amount) {
