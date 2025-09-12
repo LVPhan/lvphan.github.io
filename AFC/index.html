@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Fee Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #4a6741);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .input-section {
+            padding: 30px 30px 0px 30px;
+            background: white;
+        }
+        
+        .input-group {
+            margin-bottom: 30px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+        
+        .calculators {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 0px 30px 30px 30px;
+            background: #f8f9fa;
+        }
+        
+        .calculator {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e6ed;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .calculator:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .calculator-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .nellis-logo {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .macbids-logo {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .calculator h3 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 1rem;
+        }
+        
+        .calculation-row:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin: 15px -10px -10px -10px;
+            padding: 15px 20px;
+            border-radius: 8px;
+        }
+        
+        .calculation-row .label {
+            color: #5a6c7d;
+        }
+        
+        .calculation-row:last-child .label {
+            color: white;
+        }
+        
+        .calculation-row .value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .calculation-row:last-child .value {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .calculators {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            .logo-placeholder {
+                width: 50px;
+                height: 50px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔨 Auction Fee Calculator</h1>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="bidAmount">Bid Amount ($)</label>
+                <input type="number" id="bidAmount" placeholder="0.00" step="0.01" min="0">
+            </div>
+        </div>
+        
+        <div class="calculators">
+            <div class="calculator">
+                <div class="calculator-header">
+                    <div class="logo-placeholder nellis-logo">NELLIS<br>AUCTION</div>
+                    <h3>Nellis Auction</h3>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Winning Bid:</span>
+                    <span class="value" id="nellis-bid">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Buyer's Premium (15%):</span>
+                    <span class="value" id="nellis-premium">$0.00</span>
+                </div>
+
+                <div class="calculation-row">
+                    <span class="label"></span>
+                    <span class="value"></span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Subtotal:</span>
+                    <span class="value" id="nellis-subtotal">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Sales Tax (8.375%):</span>
+                    <span class="value" id="nellis-tax">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label"></span>
+                    <span class="value"></span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">TOTAL COST:</span>
+                    <span class="value" id="nellis-total">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="calculator">
+                <div class="calculator-header">
+                    <div class="logo-placeholder macbids-logo">MAC<br>BIDS</div>
+                    <h3>Mac.Bids</h3>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Bid:</span>
+                    <span class="value" id="macbids-bid">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Buyer's Premium (15%):</span>
+                    <span class="value" id="macbids-premium">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Lot Fee:</span>
+                    <span class="value" id="macbids-lot-fee">$3.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Subtotal:</span>
+                    <span class="value" id="macbids-subtotal">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">Sales Tax (8.375%):</span>
+                    <span class="value" id="macbids-tax">$0.00</span>
+                </div>
+                
+                <div class="calculation-row">
+                    <span class="label">TOTAL COST:</span>
+                    <span class="value" id="macbids-total">$0.00</span>
+                </div>
+            </div>
+        </div>
+    
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+        
+        function calculateFees() {
+            const bidAmount = parseFloat(document.getElementById('bidAmount').value) || 0;
+            
+            // Nellis Auction Calculations
+            const nellisBid = bidAmount;
+            const nellisPremium = bidAmount * 0.15;  // 15% buyer's premium
+            const nellisSubtotal = nellisBid + nellisPremium;
+            const nellisTax = nellisSubtotal * 0.08375;  // 8.375% sales tax
+            const nellisTotal = nellisSubtotal + nellisTax;
+            
+            // Mac.Bids Calculations
+            const macbidsBid = bidAmount;
+            const macbidsPremium = bidAmount * 0.15;  // 15% buyer's premium
+            const macbidsLotFee = 3.00;  // Flat $3 lot fee
+            const macbidsSubtotal = macbidsBid + macbidsPremium + macbidsLotFee;
+            const macbidsTax = macbidsSubtotal * 0.08375;  // 8.375% sales tax
+            const macbidsTotal = macbidsSubtotal + macbidsTax;
+            
+            // Update Nellis display
+            document.getElementById('nellis-bid').textContent = formatCurrency(nellisBid);
+            document.getElementById('nellis-premium').textContent = formatCurrency(nellisPremium);
+            document.getElementById('nellis-subtotal').textContent = formatCurrency(nellisSubtotal);
+            document.getElementById('nellis-tax').textContent = formatCurrency(nellisTax);
+            document.getElementById('nellis-total').textContent = formatCurrency(nellisTotal);
+            
+            // Update Mac.Bids display
+            document.getElementById('macbids-bid').textContent = formatCurrency(macbidsBid);
+            document.getElementById('macbids-premium').textContent = formatCurrency(macbidsPremium);
+            document.getElementById('macbids-lot-fee').textContent = formatCurrency(macbidsLotFee);
+            document.getElementById('macbids-subtotal').textContent = formatCurrency(macbidsSubtotal);
+            document.getElementById('macbids-tax').textContent = formatCurrency(macbidsTax);
+            document.getElementById('macbids-total').textContent = formatCurrency(macbidsTotal);
+        }
+        
+        // Add event listener for real-time calculation
+        document.getElementById('bidAmount').addEventListener('input', calculateFees);
+        
+        // Initial calculation
+        calculateFees();
+    </script>
+</body>
+</html>
