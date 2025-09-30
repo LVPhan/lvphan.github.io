@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceLater - We'll Get To It Eventually</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a4d2e 0%, #0d2818 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: #0a3622;
+            padding: 20px 40px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            color: #6dd400;
+            font-size: 32px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-sub {
+            color: #a8e063;
+            font-size: 14px;
+            font-weight: normal;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .nav {
+            background: #2d5f3f;
+            padding: 15px 40px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav a {
+            color: #c8e6c9;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .nav a:hover {
+            background: #3d7f5f;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .search-section {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .search-title {
+            color: #0a3622;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #6dd400;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #5ab300;
+            box-shadow: 0 0 0 3px rgba(109, 212, 0, 0.1);
+        }
+
+        .search-btn {
+            background: #6dd400;
+            color: #0a3622;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #5ab300;
+        }
+
+        .helper-text {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .result-section {
+            min-height: 300px;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .incident-card {
+            background: white;
+            border: 2px solid #6dd400;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .incident-number {
+            font-size: 24px;
+            color: #0a3622;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            background: #ffeb3b;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .incident-info {
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #0a3622;
+            width: 150px;
+        }
+
+        .info-value {
+            color: #666;
+        }
+
+        .gif-container {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .gif-container img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .gif-caption {
+            margin-top: 15px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                ServiceLater™
+                <span class="logo-sub">We'll get to it... eventually</span>
+            </div>
+        </div>
+
+        <div class="nav">
+            <a href="#">Incidents (Pending Forever)</a>
+            <a href="#">Problems (What Problems?)</a>
+            <a href="#">Changes (Never Approved)</a>
+            <a href="#">Support (On Break)</a>
+        </div>
+
+        <div class="content">
+            <div class="search-section">
+                <h2 class="search-title">Search Incidents</h2>
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="incNumber" 
+                        placeholder="Enter incident number (e.g., INC0012345)"
+                        onkeypress="if(event.key==='Enter') searchIncident()"
+                    >
+                    <button class="search-btn" onclick="searchIncident()">Search</button>
+                </div>
+                <div class="helper-text">
+                    💡 Pro tip: All incidents are "In Progress" forever
+                </div>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="incident-card">
+                    <div class="incident-header">
+                        <div class="incident-number" id="incDisplay"></div>
+                        <div class="status-badge">EVENTUALLY</div>
+                    </div>
+
+                    <div class="incident-info">
+                        <div class="info-row">
+                            <div class="info-label">Priority:</div>
+                            <div class="info-value">P5 - Whenever We Feel Like It</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Assigned To:</div>
+                            <div class="info-value">Someone (Probably)</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Created:</div>
+                            <div class="info-value">A long time ago</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Expected Resolution:</div>
+                            <div class="info-value">🤷 Heat death of the universe</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Description:</div>
+                            <div class="info-value">Your ticket is in our system. We acknowledge its existence. That's progress!</div>
+                        </div>
+                    </div>
+
+                    <div class="gif-container" id="gifContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            ServiceLater™ - Procrastination as a Service | "Your incident is important to us... just not right now"
+        </div>
+    </div>
+
+    <script>
+        const funnyGifs = [
+            'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+            'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif',
+            'https://media.giphy.com/media/26FPy3QZQqGtDcrja/giphy.gif',
+            'https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif',
+            'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+            'https://media.giphy.com/media/3o7TKwmnDgQb5jemjK/giphy.gif',
+            'https://media.giphy.com/media/xUPGcC0R9QjyxkPnS8/giphy.gif',
+            'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif',
+            'https://media.giphy.com/media/l0HlQGDRAcRvCSxVe/giphy.gif',
+            'https://media.giphy.com/media/3o6ZsZdNs3yE5l6hWM/giphy.gif'
+        ];
+
+        const captions = [
+            "Our technician hard at work on your ticket",
+            "Current status of your incident",
+            "Your request being processed",
+            "IT department evaluating your issue",
+            "This is fine. Everything is fine.",
+            "Escalating to senior management",
+            "Searching for the right person to assign this to",
+            "Your ticket in the queue",
+            "Tech support investigating the root cause",
+            "Implementing the solution"
+        ];
+
+        function searchIncident() {
+            const incInput = document.getElementById('incNumber');
+            const incNumber = incInput.value.trim();
+            
+            if (!incNumber) {
+                alert('Please enter an incident number!');
+                return;
+            }
+
+            const randomGif = funnyGifs[Math.floor(Math.random() * funnyGifs.length)];
+            const randomCaption = captions[Math.floor(Math.random() * captions.length)];
+
+            document.getElementById('incDisplay').textContent = incNumber.toUpperCase();
+            document.getElementById('gifContainer').innerHTML = `
+                <img src="${randomGif}" alt="Funny IT gif" onload="this.style.opacity=1" style="opacity:0; transition: opacity 0.3s;">
+                <div class="gif-caption">${randomCaption}</div>
+            `;
+            
+            document.getElementById('resultSection').classList.add('active');
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
