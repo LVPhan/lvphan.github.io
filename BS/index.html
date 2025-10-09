@@ -1,530 +1,1133 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="https://img.icons8.com/?size=100&id=OzMoRjfKChAo&format=png&color=000000"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill Splitter</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f5f5f5;
-        padding: 20px;
-        min-height: 100vh;
-      }
-
-      @media (max-width: 768px) {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-          padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            padding-bottom: 100px;
+            min-height: 100vh;
         }
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        background: white;
-        padding: 40px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      @media (max-width: 768px) {
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 140px;
+            }
+        }
+        
         .container {
-          padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-      }
-
-      @media (max-width: 480px) {
-        .container {
-          padding: 15px;
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                padding-bottom: 20px;
+            }
         }
-      }
-
-      h1 {
-        font-size: 24px;
-        margin-bottom: 30px;
-        color: #333;
-      }
-
-      @media (max-width: 480px) {
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+        }
+        
         h1 {
-          font-size: 20px;
-          margin-bottom: 20px;
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 700;
         }
-      }
-
-      .controls {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      @media (max-width: 480px) {
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 480px) {
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 20px;
+            }
+        }
+        
         .controls {
-          flex-direction: column;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-
-        .controls button {
-          width: 100%;
+        
+        @media (max-width: 768px) {
+            .controls {
+                display: none;
+            }
         }
-      }
-
-      .extras {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        align-items: flex-end;
-      }
-
-      @media (max-width: 768px) {
+        
+        .tabs {
+            display: none;
+            margin-bottom: 20px;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                display: flex;
+            }
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px 0;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .tab.active {
+            background: #2196F3;
+            color: white;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 16px 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (min-width: 769px) {
+            #peopleTab, #summaryTab {
+                display: block !important;
+                contain: layout style;
+                clear: both;
+            }
+            
+            #sharedTab {
+                display: block !important;
+                margin-top: 40px;
+                contain: layout style;
+                clear: both;
+                padding-top: 40px;
+                border-top: 3px solid #e0e0e0;
+            }
+            
+            .section-header {
+                display: block;
+            }
+        }
+        
+        .section-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2196F3;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e3f2fd;
+            display: none;
+        }
+        
+        @media (min-width: 769px) {
+            .section-header {
+                display: block;
+            }
+        }
+        
+        #sharedTab .section-header {
+            color: #ff9800;
+            border-bottom-color: #ffe0b2;
+        }
+        
         .extras {
-          flex-direction: column;
-          align-items: stretch;
-          gap: 15px;
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            align-items: flex-end;
         }
-      }
+        
+        @media (min-width: 769px) {
+            .extras {
+                margin-bottom: 40px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .extras {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                padding: 16px;
+            }
+        }
+        
+        .extra-field {
+            flex: 1;
+        }
+        
+        .extra-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .extra-field input {
+            width: 100%;
+        }
+        
+        .toggle-field {
+            flex: 1;
+        }
 
-      .extra-field {
-        flex: 1;
-      }
-
-      .extra-field label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: #333;
-        font-size: 14px;
-      }
-
-      .extra-field input {
-        width: 100%;
-      }
-
-      .toggle-field {
-        flex: 1;
-      }
-
-      .toggle-container {
-        display: flex;
-        background: white;
-        border-radius: 6px;
-        overflow: hidden;
-        border: 2px solid #ddd;
-      }
-
-      .toggle-option {
-        flex: 1;
-        padding: 10px 15px;
-        text-align: center;
-        cursor: pointer;
-        background: white;
-        border: none;
-        font-size: 14px;
-        font-weight: 500;
-        color: #666;
-        transition: all 0.2s;
-      }
-
-      .toggle-option.active {
-        background: #4caf50;
-        color: white;
-      }
-
-      .toggle-option:hover:not(.active) {
-        background: #f0f0f0;
-      }
-
-      .people-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-
-      @media (max-width: 768px) {
+        .toggle-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+        }
+        
+        .toggle-option {
+            flex: 1;
+            padding: 14px 15px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+        }
+        
+        @media (max-width: 768px) {
+            .toggle-option {
+                padding: 16px 15px;
+            }
+        }
+        
+        .toggle-option.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .toggle-option:hover:not(.active) {
+            background: #f0f0f0;
+        }
+        
         .people-grid {
-          grid-template-columns: 1fr;
-          gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
-      }
-
-      @media (min-width: 769px) and (max-width: 1024px) {
-        .people-grid {
-          grid-template-columns: repeat(2, 1fr);
+        
+        @media (min-width: 769px) {
+            #peopleGrid {
+                margin-bottom: 0;
+            }
         }
-      }
-
-      .person-column {
-        background: #f9f9f9;
-        border-radius: 8px;
-        padding: 20px;
-        border: 2px solid #e0e0e0;
-      }
-
-      .person-header {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
-
-      .person-header input {
-        flex: 1;
-      }
-
-      .btn-remove-person {
-        background: #ff4444;
-        color: white;
-        padding: 8px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      .btn-remove-person:hover {
-        background: #cc0000;
-      }
-
-      .items-list {
-        margin-bottom: 15px;
-      }
-
-      .item {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-
-      .item input[type="text"] {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .item input[type="number"] {
-        width: 80px;
-      }
-
-      @media (max-width: 480px) {
+        
+        @media (max-width: 768px) {
+            .people-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        .person-column {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            transition: border-color 0.2s;
+        }
+        
+        @media (max-width: 768px) {
+            .person-column {
+                padding: 18px;
+            }
+        }
+        
+        .shared-column {
+            background: #fff8e1;
+            border: 2px solid #ffa726;
+        }
+        
+        .shared-column h3 {
+            color: #f57c00;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .person-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .person-header input {
+            flex: 1;
+        }
+        
+        .btn-remove-person {
+            background: #ff4444;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+            min-width: 48px;
+            min-height: 48px;
+        }
+        
+        .btn-remove-person:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+        
+        .items-list {
+            margin-bottom: 15px;
+        }
+        
         .item {
-          flex-wrap: wrap;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
         }
-
+        
         .item input[type="text"] {
-          width: 100%;
-          margin-bottom: 5px;
+            flex: 1;
+            min-width: 0;
         }
-
+        
         .item input[type="number"] {
-          flex: 1;
+            width: 90px;
         }
-      }
-
-      input {
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-      }
-
-      button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background 0.2s;
-      }
-
-      .btn-add-item {
-        background: #2196f3;
-        color: white;
-        width: 100%;
-        padding: 8px;
-        font-size: 13px;
-      }
-
-      .btn-add-item:hover {
-        background: #1976d2;
-      }
-
-      .btn-remove-item {
-        background: #ff6b6b;
-        color: white;
-        padding: 8px 10px;
-        font-size: 12px;
-      }
-
-      .btn-remove-item:hover {
-        background: #ff5252;
-      }
-
-      .btn-add-person {
-        background: #4caf50;
-        color: white;
-      }
-
-      .btn-add-person:hover {
-        background: #45a049;
-      }
-
-      .btn-export {
-        background: #9c27b0;
-        color: white;
-      }
-
-      .btn-export:hover {
-        background: #7b1fa2;
-      }
-
-      .person-total {
-        font-weight: 600;
-        padding: 10px;
-        background: white;
-        border-radius: 4px;
-        text-align: center;
-        margin-top: 10px;
-        color: #4caf50;
-      }
-
-      .summary {
-        margin-top: 30px;
-        padding: 30px;
-        background: #f0f0f0;
-        border-radius: 8px;
-      }
-
-      @media (max-width: 768px) {
+        
+        @media (max-width: 480px) {
+            .item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .item input[type="text"] {
+                width: 100%;
+            }
+            
+            .item input[type="number"] {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+        
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 1px #2196F3;
+        }
+        
+        @media (max-width: 768px) {
+            input {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        @media (max-width: 768px) {
+            button {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+        }
+        
+        .btn-add-item {
+            background: #2196F3;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        .btn-add-item:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .btn-add-item {
+                padding: 14px;
+            }
+        }
+        
+        .btn-remove-item {
+            background: #ff6b6b;
+            color: white;
+            padding: 12px 14px;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 48px;
+            min-height: 48px;
+        }
+        
+        .btn-remove-item:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+        
+        .btn-add-person {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-add-person:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-add-shared {
+            background: #ff9800;
+        }
+        
+        .btn-add-shared:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .btn-export {
+            background: #9C27B0;
+            color: white;
+        }
+        
+        .btn-export:hover {
+            background: #7B1FA2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(156, 39, 176, 0.3);
+        }
+        
+        .person-total {
+            font-weight: 600;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 12px;
+            color: #2196F3;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .shared-with {
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .shared-with {
+                padding: 14px;
+            }
+        }
+        
+        .shared-with-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #666;
+        }
+        
+        .person-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .person-checkbox:hover {
+            background: #f5f5f5;
+        }
+        
+        .person-checkbox input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #ff9800;
+        }
+        
+        @media (max-width: 768px) {
+            .person-checkbox input[type="checkbox"] {
+                width: 24px;
+                height: 24px;
+            }
+        }
+        
+        .person-checkbox label {
+            cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .select-all {
+            font-weight: 700;
+            color: #ff9800;
+            border-bottom: 1px solid #ffe0b2;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        
         .summary {
-          padding: 20px;
+            margin-top: 30px;
+            padding: 30px;
+            background: #f0f0f0;
+            border-radius: 12px;
         }
-      }
-
-      @media (max-width: 480px) {
-        .summary {
-          padding: 15px;
+        
+        .summary:empty {
+            display: none;
         }
-      }
-
-      .summary h2 {
-        font-size: 18px;
-        margin-bottom: 20px;
-        color: #333;
-      }
-
-      @media (max-width: 480px) {
+        
+        .summary::before {
+            content: '';
+            display: none;
+        }
+        
+        @media (min-width: 769px) {
+            .summary {
+                margin-top: 40px;
+            }
+            
+            .summary::before {
+                content: '';
+                display: block;
+                height: 3px;
+                background: #e0e0e0;
+                margin: -30px -30px 30px -30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .summary {
+                padding: 20px;
+                margin-top: 20px;
+            }
+        }
+        
         .summary h2 {
-          font-size: 16px;
-          margin-bottom: 15px;
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #2196F3;
+            font-weight: 700;
         }
-      }
-
-      .summary-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .summary-item:last-child {
-        border-bottom: none;
-      }
-
-      @media (max-width: 480px) {
+        
+        @media (max-width: 480px) {
+            .summary h2 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+        }
+        
         .summary-item {
-          flex-direction: column;
-          gap: 8px;
-          padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #ddd;
         }
-
-        .summary-item strong:last-child {
-          text-align: left;
-          font-size: 18px;
+        
+        .summary-item:last-child {
+            border-bottom: none;
         }
-      }
-
-      .summary-total {
-        font-size: 20px;
-        font-weight: 600;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid #333;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      @media (max-width: 480px) {
+        
+        @media (max-width: 480px) {
+            .summary-item {
+                flex-direction: column;
+                gap: 10px;
+                padding: 14px 0;
+            }
+            
+            .summary-item strong:last-child {
+                text-align: left;
+                font-size: 20px;
+            }
+        }
+        
         .summary-total {
-          font-size: 18px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 3px solid #333;
+            display: flex;
+            justify-content: space-between;
         }
-      }
-
-      .percentage {
-        color: #666;
-        font-size: 14px;
-      }
+        
+        @media (max-width: 480px) {
+            .summary-total {
+                font-size: 20px;
+            }
+        }
+        
+        .percentage {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .shared-indicator {
+            color: #ff9800;
+            font-style: italic;
+            font-size: 11px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-subtext {
+            font-size: 14px;
+        }
+        
+        .fab {
+            display: none;
+        }
+        
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 999;
+            display: none;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-bar {
+                display: block;
+            }
+        }
+        
+        .bottom-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .bottom-bar-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .bottom-bar-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        
+        .bottom-bar-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2196F3;
+        }
+        
+        .bottom-bar-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .bottom-bar-button {
+            background: #2196F3;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 44px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .bottom-bar-button:active {
+            transform: scale(0.95);
+        }
+        
+        .bottom-bar-button.secondary {
+            background: #9C27B0;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+        }
+        
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2196F3;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-bar {
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  </head>
-  <body>
-    <div class="container" id="capture">
-      <h1>Bill Splitter</h1>
-
-      <div class="controls">
-        <button class="btn-add-person" onclick="addPerson()">
-          👤 Add Person
-        </button>
-        <button class="btn-export" onclick="exportImage()">
-          📸 Export as Image
-        </button>
-      </div>
-
-      <div class="extras">
-        <div class="extra-field">
-          <label>Tax ($)</label>
-          <input
-            type="number"
-            id="taxAmount"
-            placeholder="0.00"
-            step="0.01"
-            value="0"
-            oninput="render()"
-          />
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Bill Splitter</h1>
+        
+        <div class="controls">
+            <button class="btn-add-person" onclick="addPerson()">+ Add Person</button>
+            <button class="btn-add-person btn-add-shared" onclick="addSharedItem()">+ Add Shared Item</button>
+            <button class="btn-export" onclick="exportImage()">📸 Export Summary</button>
         </div>
-        <div class="extra-field">
-          <label>Tip ($)</label>
-          <input
-            type="number"
-            id="tipAmount"
-            placeholder="0.00"
-            step="0.01"
-            value="0"
-            oninput="render()"
-          />
+        
+        <!-- Mobile Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('people')">👥 People</button>
+            <button class="tab" onclick="switchTab('shared')">🍽️ Shared</button>
+            <button class="tab" onclick="switchTab('summary')">📊 Summary</button>
         </div>
-        <div class="toggle-field">
-          <label>Split Method</label>
-          <div class="toggle-container">
-            <button
-              class="toggle-option active"
-              id="proportionalBtn"
-              onclick="setSplitMethod('proportional')"
-            >
-              Proportional
-            </button>
-            <button
-              class="toggle-option"
-              id="evenBtn"
-              onclick="setSplitMethod('even')"
-            >
-              Even Split
-            </button>
-          </div>
+        
+        <div class="stats-bar" id="statsBar" style="display: none;">
+            <div class="stat">
+                <div class="stat-value" id="peopleCount">0</div>
+                <div class="stat-label">People</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="itemsCount">0</div>
+                <div class="stat-label">Items</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalAmount">$0.00</div>
+                <div class="stat-label">Total</div>
+            </div>
         </div>
-      </div>
-
-      <div class="people-grid" id="peopleGrid"></div>
-
-      <div class="summary" id="summary"></div>
+        
+        <div class="extras">
+            <div class="extra-field">
+                <label>💵 Tax ($)</label>
+                <input type="number" id="taxAmount" placeholder="0.00" step="0.01" value="0" oninput="updateAllPersonTotals(); renderSummary();">
+            </div>
+            <div class="extra-field">
+                <label>🙏 Tip ($)</label>
+                <input type="number" id="tipAmount" placeholder="0.00" step="0.01" value="0" oninput="updateAllPersonTotals(); renderSummary();">
+            </div>
+            <div class="toggle-field">
+                <label>✂️ Split Method</label>
+                <div class="toggle-container">
+                    <button class="toggle-option active" id="proportionalBtn" onclick="setSplitMethod('proportional')">
+                        Proportional
+                    </button>
+                    <button class="toggle-option" id="evenBtn" onclick="setSplitMethod('even')">
+                        Even Split
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- People Tab Content -->
+        <div class="tab-content active" id="peopleTab" data-section="people">
+            <h2 class="section-header">👥 People</h2>
+            <div class="people-grid people-only-grid" id="peopleGrid" data-grid="people"></div>
+        </div>
+        
+        <!-- Shared Tab Content -->
+        <div class="tab-content" id="sharedTab" data-section="shared">
+            <div class="people-grid shared-only-grid" id="sharedGrid" data-grid="shared"></div>
+        </div>
+        
+        <!-- Summary Tab Content -->
+        <div class="tab-content" id="summaryTab" data-section="summary">
+            <div class="summary" id="summary"></div>
+        </div>
     </div>
-
+    
+    <!-- Bottom bar for mobile -->
+    <div class="bottom-bar">
+        <div class="bottom-bar-content">
+            <div class="bottom-bar-info">
+                <div class="bottom-bar-label">Total Bill</div>
+                <div class="bottom-bar-amount" id="bottomBarTotal">$0.00</div>
+            </div>
+            <div class="bottom-bar-actions">
+                <button class="bottom-bar-button" id="bottomBarAddBtn" onclick="quickAdd()">+ Add</button>
+                <button class="bottom-bar-button secondary" onclick="exportImage()">📸 Export Summary</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
-      let people = [];
-      let nextPersonId = 1;
-      let nextItemId = 1;
-      let splitMethod = "proportional"; // 'proportional' or 'even'
-
-      function setSplitMethod(method) {
-        splitMethod = method;
-        document
-          .getElementById("proportionalBtn")
-          .classList.toggle("active", method === "proportional");
-        document
-          .getElementById("evenBtn")
-          .classList.toggle("active", method === "even");
-        updateAllPersonTotals();
-        renderSummary();
-      }
-
-      function addPerson() {
-        people.push({
-          id: nextPersonId++,
-          name: "",
-          items: [],
-        });
-        render();
-      }
-
-      function removePerson(personId) {
-        people = people.filter((p) => p.id !== personId);
-        render();
-      }
-
-      function updatePersonName(personId, name) {
-        const person = people.find((p) => p.id === personId);
-        if (person) {
-          person.name = name;
-          renderSummary(); // Only update summary, not full render
+        let people = [];
+        let sharedItems = [];
+        let nextPersonId = 1;
+        let nextItemId = 1;
+        let splitMethod = 'proportional';
+        let currentTab = 'people';
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            const addBtn = document.getElementById('bottomBarAddBtn');
+            
+            if (tab === 'people') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('peopleTab').classList.add('active');
+                addBtn.textContent = '+ Add Person 👥';
+            } else if (tab === 'shared') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('sharedTab').classList.add('active');
+                addBtn.textContent = '+ Add Shared 🍽️';
+            } else if (tab === 'summary') {
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                document.getElementById('summaryTab').classList.add('active');
+                addBtn.style.display = 'none';
+                return;
+            }
+            
+            addBtn.style.display = 'block';
         }
-      }
-
-      function addItem(personId) {
-        const person = people.find((p) => p.id === personId);
-        if (person) {
-          person.items.push({
-            id: nextItemId++,
-            name: "",
-            price: 0,
-          });
-          render();
+        
+        function quickAdd() {
+            if (currentTab === 'people') {
+                addPerson();
+            } else if (currentTab === 'shared') {
+                addSharedItem();
+            }
         }
-      }
-
-      function removeItem(personId, itemId) {
-        const person = people.find((p) => p.id === personId);
-        if (person) {
-          person.items = person.items.filter((i) => i.id !== itemId);
-          render();
-        }
-      }
-
-      function updateItem(personId, itemId, field, value) {
-        const person = people.find((p) => p.id === personId);
-        if (person) {
-          const item = person.items.find((i) => i.id === itemId);
-          if (item) {
-            item[field] = field === "price" ? parseFloat(value) || 0 : value;
+        
+        function setSplitMethod(method) {
+            splitMethod = method;
+            document.getElementById('proportionalBtn').classList.toggle('active', method === 'proportional');
+            document.getElementById('evenBtn').classList.toggle('active', method === 'even');
             updateAllPersonTotals();
             renderSummary();
-          }
         }
-      }
-
-      function updateAllPersonTotals() {
-        const { totals } = calculateTotals();
-
-        totals.forEach((personData) => {
-          const personColumn = document.querySelector(
-            `[data-person-id="${personData.id}"]`
-          );
-          if (personColumn) {
-            const totalDiv = personColumn.querySelector(".person-total");
-            if (totalDiv) {
-              totalDiv.innerHTML = `
+        
+        function addPerson() {
+            people.push({
+                id: nextPersonId,
+                name: `Person ${nextPersonId}`,
+                items: []
+            });
+            nextPersonId++;
+            render();
+        }
+        
+        function removePerson(personId) {
+            const person = people.find(p => p.id === personId);
+            const hasItems = person && person.items.length > 0;
+            
+            if (hasItems) {
+                if (!confirm(`Remove ${person.name || 'this person'} and their items?`)) {
+                    return;
+                }
+            }
+            
+            people = people.filter(p => p.id !== personId);
+            sharedItems.forEach(item => {
+                item.sharedWith = item.sharedWith.filter(id => id !== personId);
+            });
+            render();
+        }
+        
+        function updatePersonName(personId, name) {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+                person.name = name;
+                renderSummary();
+                updateStats();
+            }
+        }
+        
+        function addItem(personId) {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+                person.items.push({
+                    id: nextItemId++,
+                    name: '',
+                    price: 0
+                });
+                render();
+            }
+        }
+        
+        function addSharedItem() {
+            sharedItems.push({
+                id: nextItemId++,
+                name: '',
+                price: 0,
+                sharedWith: people.map(p => p.id)
+            });
+            render();
+        }
+        
+        function removeItem(personId, itemId) {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+                person.items = person.items.filter(i => i.id !== itemId);
+                render();
+            }
+        }
+        
+        function removeSharedItem(itemId) {
+            sharedItems = sharedItems.filter(i => i.id !== itemId);
+            render();
+        }
+        
+        function updateItem(personId, itemId, field, value) {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+                const item = person.items.find(i => i.id === itemId);
+                if (item) {
+                    item[field] = field === 'price' ? parseFloat(value) || 0 : value;
+                    updateAllPersonTotals();
+                    renderSummary();
+                    updateStats();
+                }
+            }
+        }
+        
+        function updateSharedItem(itemId, field, value) {
+            const item = sharedItems.find(i => i.id === itemId);
+            if (item) {
+                item[field] = field === 'price' ? parseFloat(value) || 0 : value;
+                
+                // Show warning if no one is selected
+                if (field === 'price' && item.sharedWith.length === 0 && item.price > 0) {
+                    alert('⚠️ This shared item has no people selected!');
+                }
+                
+                render(); // Full render to update per-person amounts
+            }
+        }
+        
+        function toggleSharedWith(itemId, personId) {
+            const item = sharedItems.find(i => i.id === itemId);
+            if (item) {
+                const index = item.sharedWith.indexOf(personId);
+                if (index > -1) {
+                    item.sharedWith.splice(index, 1);
+                } else {
+                    item.sharedWith.push(personId);
+                }
+                render(); // Full render to update per-person amounts
+            }
+        }
+        
+        function toggleSharedWithAll(itemId) {
+            const item = sharedItems.find(i => i.id === itemId);
+            if (item) {
+                if (item.sharedWith.length === people.length) {
+                    item.sharedWith = [];
+                } else {
+                    item.sharedWith = people.map(p => p.id);
+                }
+                render();
+            }
+        }
+        
+        function calculateTotals() {
+            const subtotal = people.reduce((sum, p) => 
+                sum + p.items.reduce((itemSum, item) => itemSum + item.price, 0), 0
+            );
+            
+            const sharedSubtotal = sharedItems.reduce((sum, item) => sum + item.price, 0);
+            const totalSubtotal = subtotal + sharedSubtotal;
+            
+            const taxAmount = parseFloat(document.getElementById('taxAmount').value) || 0;
+            const tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
+            
+            const totals = people.map(p => {
+                const personSubtotal = p.items.reduce((sum, item) => sum + item.price, 0);
+                
+                const personSharedSubtotal = sharedItems.reduce((sum, item) => {
+                    if (item.sharedWith.includes(p.id) && item.sharedWith.length > 0) {
+                        return sum + (item.price / item.sharedWith.length);
+                    }
+                    return sum;
+                }, 0);
+                
+                const personTotalSubtotal = personSubtotal + personSharedSubtotal;
+                
+                let personTax, personTip, proportion;
+                
+                if (splitMethod === 'even') {
+                    const numPeople = people.length;
+                    personTax = numPeople > 0 ? taxAmount / numPeople : 0;
+                    personTip = numPeople > 0 ? tipAmount / numPeople : 0;
+                    proportion = numPeople > 0 ? 1 / numPeople : 0;
+                } else {
+                    proportion = totalSubtotal > 0 ? personTotalSubtotal / totalSubtotal : 0;
+                    personTax = taxAmount * proportion;
+                    personTip = tipAmount * proportion;
+                }
+                
+                const total = personTotalSubtotal + personTax + personTip;
+                
+                return {
+                    ...p,
+                    subtotal: personSubtotal,
+                    sharedSubtotal: personSharedSubtotal,
+                    totalSubtotal: personTotalSubtotal,
+                    tax: personTax,
+                    tip: personTip,
+                    total: total,
+                    proportion: proportion
+                };
+            });
+            
+            const grandTotal = totalSubtotal + taxAmount + tipAmount;
+            return { totals, grandTotal, subtotal: totalSubtotal, taxAmount, tipAmount };
+        }
+        
+        function updateStats() {
+            const { grandTotal } = calculateTotals();
+            const totalItems = people.reduce((sum, p) => sum + p.items.length, 0) + sharedItems.length;
+            
+            document.getElementById('peopleCount').textContent = people.length;
+            document.getElementById('itemsCount').textContent = totalItems;
+            document.getElementById('totalAmount').textContent = `$${grandTotal.toFixed(2)}`;
+            document.getElementById('bottomBarTotal').textContent = `$${grandTotal.toFixed(2)}`;
+            
+            if (people.length > 0 || sharedItems.length > 0) {
+                document.getElementById('statsBar').style.display = 'flex';
+            } else {
+                document.getElementById('statsBar').style.display = 'none';
+            }
+        }
+        
+        function updateAllPersonTotals() {
+            const { totals } = calculateTotals();
+            
+            totals.forEach(personData => {
+                const personColumn = document.querySelector(`[data-person-id="${personData.id}"]`);
+                if (personColumn) {
+                    const totalDiv = personColumn.querySelector('.person-total');
+                    if (totalDiv) {
+                        totalDiv.innerHTML = `
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                                Subtotal: $${personData.subtotal.toFixed(2)}<br>
+                                Items: $${personData.subtotal.toFixed(2)}<br>
+                                ${personData.sharedSubtotal > 0 ? `Shared: $${personData.sharedSubtotal.toFixed(2)}<br>` : ''}
                                 Tax: $${personData.tax.toFixed(2)}<br>
                                 Tip: $${personData.tip.toFixed(2)}
                             </div>
@@ -532,198 +1135,214 @@
                                 Total: $${personData.total.toFixed(2)}
                             </div>
                         `;
+                    }
+                }
+            });
+            
+            updateStats();
+        }
+        
+        function render() {
+            // Clear all grids first to prevent any stale content
+            const peopleGridEl = document.getElementById('peopleGrid');
+            const sharedGridEl = document.getElementById('sharedGrid');
+            if (peopleGridEl) peopleGridEl.innerHTML = '';
+            if (sharedGridEl) sharedGridEl.innerHTML = '';
+            
+            // Now render fresh content
+            renderPeopleGrid();
+            renderSharedGrid();
+            renderSummary();
+            updateStats();
+        }
+        
+        function renderPeopleGrid() {
+            const grid = document.getElementById('peopleGrid');
+            const { totals } = calculateTotals();
+            
+            if (people.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-text">No people yet</div>
+                    </div>
+                `;
+                return;
             }
-          }
-        });
-      }
-
-      function calculateTotals() {
-        const subtotal = people.reduce(
-          (sum, p) =>
-            sum + p.items.reduce((itemSum, item) => itemSum + item.price, 0),
-          0
-        );
-
-        const taxAmount =
-          parseFloat(document.getElementById("taxAmount").value) || 0;
-        const tipAmount =
-          parseFloat(document.getElementById("tipAmount").value) || 0;
-
-        const totals = people.map((p) => {
-          const personSubtotal = p.items.reduce(
-            (sum, item) => sum + item.price,
-            0
-          );
-
-          let personTax, personTip, proportion;
-
-          if (splitMethod === "even") {
-            // Split evenly among all people
-            const numPeople = people.length;
-            personTax = numPeople > 0 ? taxAmount / numPeople : 0;
-            personTip = numPeople > 0 ? tipAmount / numPeople : 0;
-            proportion = numPeople > 0 ? 1 / numPeople : 0;
-          } else {
-            // Split proportionally based on what each person spent
-            proportion = subtotal > 0 ? personSubtotal / subtotal : 0;
-            personTax = taxAmount * proportion;
-            personTip = tipAmount * proportion;
-          }
-
-          const total = personSubtotal + personTax + personTip;
-
-          return {
-            ...p,
-            subtotal: personSubtotal,
-            tax: personTax,
-            tip: personTip,
-            total: total,
-            proportion: proportion,
-          };
-        });
-
-        const grandTotal = subtotal + taxAmount + tipAmount;
-        return { totals, grandTotal, subtotal, taxAmount, tipAmount };
-      }
-
-      function render() {
-        renderGrid();
-        renderSummary();
-      }
-
-      function renderGrid() {
-        const grid = document.getElementById("peopleGrid");
-        const { totals } = calculateTotals();
-
-        grid.innerHTML = people
-          .map((person) => {
-            const personData = totals.find((t) => t.id === person.id);
-
-            return `
+            
+            // Only render people columns; shared items are shown in the shared tab/grid
+            grid.innerHTML = people.map(person => {
+                const personData = totals.find(t => t.id === person.id);
+                
+                return `
                     <div class="person-column" data-person-id="${person.id}">
                         <div class="person-header">
                             <input 
                                 type="text" 
-                                placeholder="Name" 
+                                placeholder="Person name" 
                                 value="${person.name}"
-                                onblur="updatePersonName(${
-                                  person.id
-                                }, this.value)"
+                                onblur="updatePersonName(${person.id}, this.value)"
                                 onkeypress="if(event.key === 'Enter') { this.blur(); }"
                             />
-                            <button class="btn-remove-person" onclick="removePerson(${
-                              person.id
-                            })">×</button>
+                            <button class="btn-remove-person" onclick="removePerson(${person.id})">×</button>
                         </div>
                         
                         <div class="items-list">
-                            ${person.items
-                              .map(
-                                (item) => `
+                            ${person.items.map(item => `
                                 <div class="item">
                                     <input 
                                         type="text" 
                                         placeholder="Item" 
                                         value="${item.name}"
-                                        onblur="updateItem(${person.id}, ${
-                                  item.id
-                                }, 'name', this.value)"
+                                        onblur="updateItem(${person.id}, ${item.id}, 'name', this.value)"
                                         onkeypress="if(event.key === 'Enter') { this.blur(); }"
                                     />
                                     <input 
                                         type="number" 
                                         placeholder="0.00" 
                                         step="0.01"
-                                        value="${item.price || ""}"
-                                        onblur="updateItem(${person.id}, ${
-                                  item.id
-                                }, 'price', this.value)"
+                                        value="${item.price || ''}"
+                                        onblur="updateItem(${person.id}, ${item.id}, 'price', this.value)"
                                         onkeypress="if(event.key === 'Enter') { this.blur(); }"
                                     />
-                                    <button class="btn-remove-item" onclick="removeItem(${
-                                      person.id
-                                    }, ${item.id})">×</button>
+                                    <button class="btn-remove-item" onclick="removeItem(${person.id}, ${item.id})">×</button>
                                 </div>
-                            `
-                              )
-                              .join("")}
+                            `).join('')}
                         </div>
                         
-                        <button class="btn-add-item" onclick="addItem(${
-                          person.id
-                        })">+ Add Item</button>
+                        <button class="btn-add-item" onclick="addItem(${person.id})">+ Add Item</button>
                         
                         <div class="person-total">
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                                Subtotal: $${personData.subtotal.toFixed(2)}<br>
-                                Tax: $${personData.tax.toFixed(2)}<br>
-                                Tip: $${personData.tip.toFixed(2)}
+                                Items: ${personData.subtotal.toFixed(2)}<br>
+                                ${personData.sharedSubtotal > 0 ? `Shared: ${personData.sharedSubtotal.toFixed(2)}<br>` : ''}
+                                Tax: ${personData.tax.toFixed(2)}<br>
+                                Tip: ${personData.tip.toFixed(2)}
                             </div>
                             <div style="font-size: 16px; font-weight: 700;">
-                                Total: $${personData.total.toFixed(2)}
+                                Total: ${personData.total.toFixed(2)}
                             </div>
                         </div>
                     </div>
                 `;
-          })
-          .join("");
-      }
-
-      function renderSummary() {
-        const { totals, grandTotal, subtotal, taxAmount, tipAmount } =
-          calculateTotals();
-        const summaryDiv = document.getElementById("summary");
-
-        if (people.length > 0 && grandTotal > 0) {
-          summaryDiv.innerHTML = `
-                    <h2>Summary</h2>
-                    ${totals
-                      .map((person) => {
-                        const percentage = (
-                          (person.total / grandTotal) *
-                          100
-                        ).toFixed(1);
+            }).join('');
+        }
+        
+        function renderSharedGrid() {
+            const grid = document.getElementById('sharedGrid');
+            
+            if (sharedItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <div class="empty-state-text">No shared items yet</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // On mobile, show each shared item as its own card
+            grid.innerHTML = sharedItems.map(item => `
+                <div class="person-column shared-column">
+                    <div class="person-header" style="margin-bottom: 15px; justify-content: space-between; align-items: center; display: flex;">
+                        <h3 style="flex: 1; margin: 0; color: #f57c00; font-size: 18px; font-weight: 700;">🍽️ ${item.name || 'Shared Item'}</h3>
+                        <button class="btn-remove-person" style="margin-left: 10px; min-width: 36px; min-height: 36px; font-size: 22px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="removeSharedItem(${item.id})">×</button>
+                    </div>
+                    
+                    <div class="items-list">
+                        <div class="item">
+                            <input 
+                                type="text" 
+                                placeholder="Item" 
+                                value="${item.name}"
+                                onblur="updateSharedItem(${item.id}, 'name', this.value)"
+                                onkeypress="if(event.key === 'Enter') { this.blur(); }"
+                            />
+                            <input 
+                                type="number" 
+                                placeholder="0.00" 
+                                step="0.01"
+                                value="${item.price || ''}"
+                                onblur="updateSharedItem(${item.id}, 'price', this.value)"
+                                onkeypress="if(event.key === 'Enter') { this.blur(); }"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="shared-with">
+                        <div class="shared-with-header">Shared with:</div>
+                        <div class="person-checkbox select-all">
+                            <input 
+                                type="checkbox" 
+                                id="all-${item.id}"
+                                ${item.sharedWith.length === people.length ? 'checked' : ''}
+                                onchange="toggleSharedWithAll(${item.id})"
+                            />
+                            <label for="all-${item.id}">All</label>
+                        </div>
+                        ${people.map(p => `
+                            <div class="person-checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    id="share-${item.id}-${p.id}"
+                                    ${item.sharedWith.includes(p.id) ? 'checked' : ''}
+                                    onchange="toggleSharedWith(${item.id}, ${p.id})"
+                                />
+                                <label for="share-${item.id}-${p.id}">${p.name}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${item.sharedWith.length > 0 ? `
+                        <div class="person-total">
+                            <div style="font-size: 14px;">
+                                ${(item.price / item.sharedWith.length).toFixed(2)} per person
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function renderSummary() {
+            const { totals, grandTotal, subtotal, taxAmount, tipAmount } = calculateTotals();
+            const summaryDiv = document.getElementById('summary');
+            
+            const hasItems = people.some(p => p.items.length > 0 && p.items.some(item => item.price > 0)) || 
+                             sharedItems.some(item => item.price > 0);
+            
+            if (people.length > 0 && grandTotal > 0 && hasItems) {
+                summaryDiv.innerHTML = `
+                    <h2>📊 Bill Summary</h2>
+                    ${totals.map(person => {
+                        const percentage = ((person.total / grandTotal) * 100).toFixed(1);
+                        const personSharedItems = sharedItems.filter(item => item.sharedWith.includes(person.id));
+                        
                         return `
                             <div class="summary-item">
                                 <div style="flex: 1;">
-                                    <strong>${person.name || "Unnamed"}</strong>
+                                    <strong>${person.name}</strong>
                                     <span class="percentage"> (${percentage}% of total)</span>
                                     <div style="font-size: 13px; color: #666; margin-top: 8px; line-height: 1.6;">
-                                        ${
-                                          person.items.length > 0
-                                            ? person.items
-                                                .map(
-                                                  (item) =>
-                                                    `• ${
-                                                      item.name || "Item"
-                                                    }: $${item.price.toFixed(
-                                                      2
-                                                    )}`
-                                                )
-                                                .join("<br>")
-                                            : "• No items"
-                                        }
-                                        <br><span style="color: #888;">Subtotal: $${person.subtotal.toFixed(
-                                          2
-                                        )}</span>
-                                        <br><span style="color: #888;">Tax: $${person.tax.toFixed(
-                                          2
-                                        )}</span>
-                                        <br><span style="color: #888;">Tip: $${person.tip.toFixed(
-                                          2
-                                        )}</span>
+                                        ${person.items.length > 0 ? person.items.map(item => 
+                                            `• ${item.name || 'Item'}: $${item.price.toFixed(2)}`
+                                        ).join('<br>') : ''}
+                                        ${personSharedItems.length > 0 ? personSharedItems.map(item => 
+                                            `<br>• ${item.name || 'Shared Item'}: $${(item.price / item.sharedWith.length).toFixed(2)} <span class="shared-indicator">(shared with ${item.sharedWith.length})</span>`
+                                        ).join('') : ''}
+                                        ${person.items.length === 0 && personSharedItems.length === 0 ? '• No items' : ''}
+                                        <br><span style="color: #888;">Subtotal: $${person.totalSubtotal.toFixed(2)}</span>
+                                        <br><span style="color: #888;">Tax: $${person.tax.toFixed(2)}</span>
+                                        <br><span style="color: #888;">Tip: $${person.tip.toFixed(2)}</span>
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <strong style="font-size: 18px; color: #4CAF50;">$${person.total.toFixed(
-                                      2
-                                    )}</strong>
+                                    <strong style="font-size: 18px; color: #2196F3;">${person.total.toFixed(2)}</strong>
                                 </div>
                             </div>
                         `;
-                      })
-                      .join("")}
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc; color: #666; font-size: 14px;">
+                    }).join('')}
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #333; color: #666; font-size: 14px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                             <span>Items Subtotal:</span>
                             <span>$${subtotal.toFixed(2)}</span>
@@ -742,44 +1361,54 @@
                         <span>$${grandTotal.toFixed(2)}</span>
                     </div>
                 `;
-        } else {
-          summaryDiv.innerHTML = "";
+            } else {
+                summaryDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-text">No items to summarize</div>
+                        <div class="empty-state-subtext">Add people and items to see the breakdown</div>
+                    </div>
+                `;
+            }
         }
-      }
-
-      async function exportImage() {
-        const element = document.getElementById("summary");
-
-        // Check if there's content to export
-        if (!element.innerHTML) {
-          alert("Please add some items before exporting.");
-          return;
+        
+        async function exportImage() {
+            const element = document.getElementById('summary');
+            
+            if (!element.innerHTML || element.innerHTML.includes('empty-state')) {
+                alert('Please add some items before exporting.');
+                return;
+            }
+            
+            try {
+                const canvas = await html2canvas(element, {
+                    backgroundColor: '#f0f0f0',
+                    scale: 2
+                });
+                
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'bill-split-' + new Date().getTime() + '.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export image. Please try again.');
+            }
         }
-
-        try {
-          const canvas = await html2canvas(element, {
-            backgroundColor: "#f0f0f0",
-            scale: 2,
-          });
-
-          // Convert to blob and download
-          canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "bill-split-" + new Date().getTime() + ".png";
-            a.click();
-            URL.revokeObjectURL(url);
-          });
-        } catch (error) {
-          console.error("Export failed:", error);
-          alert("Failed to export image. Please try again.");
+        
+        // Initialize
+        addPerson();
+        addPerson();
+        
+        // Initialize bottom bar button
+        const addBtn = document.getElementById('bottomBarAddBtn');
+        if (addBtn) {
+            addBtn.textContent = '+ Add Person';
         }
-      }
-
-      // Initialize with 2 people
-      addPerson();
-      addPerson();
     </script>
-  </body>
+</body>
 </html>
