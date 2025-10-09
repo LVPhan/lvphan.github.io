@@ -314,10 +314,6 @@
             margin-bottom: 15px;
         }
         
-        .person-header input {
-            flex: 1;
-        }
-        
         .btn-remove-person {
             background: #ff4444;
             color: white;
@@ -676,7 +672,38 @@
         }
         
         .fab {
-            display: none;
+              position: fixed;
+              bottom: 90px;
+              right: 20px;
+              width: 56px;
+              height: 56px;
+              border-radius: 50%;
+              background: #4CAF50;
+              color: white;
+              border: none;
+              cursor: pointer;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              z-index: 1000;
+              transition: all 0.2s;
+              display: none;
+              align-items: center;
+              justify-content: center;
+              padding: 0;
+              line-height: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .fab {
+                display: flex;
+            }
+        }
+        
+        .fab:hover {
+              transform: scale(1.13) rotate(-8deg);
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
         }
         
         .bottom-bar {
@@ -685,7 +712,7 @@
             left: 0;
             right: 0;
             background: white;
-            padding: 12px 20px;
+            padding: 15px 20px;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             z-index: 999;
             display: none;
@@ -702,53 +729,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
             max-width: 1400px;
             margin: 0 auto;
         }
         
         .bottom-bar-info {
             flex: 1;
-            min-width: 0;
         }
         
         .bottom-bar-label {
-            font-size: 11px;
+            font-size: 12px;
             color: #666;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
         
         .bottom-bar-amount {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
-            color: #2196F3;
-        }
-        
-        .bottom-bar-actions {
-            display: flex;
-            gap: 8px;
+            color: #4CAF50;
         }
         
         .bottom-bar-button {
-            background: #2196F3;
+            background: #9C27B0;
             color: white;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
             border: none;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            min-height: 44px;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        
-        .bottom-bar-button:active {
-            transform: scale(0.95);
-        }
-        
-        .bottom-bar-button.secondary {
-            background: #9C27B0;
+            min-height: 48px;
         }
         
         .stats-bar {
@@ -791,7 +801,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>💰 Bill Splitter</h1>
+        <h1 style="text-align:center; font-size:36px; font-weight:800; margin-bottom:18px;">💰 Bill Splitter</h1>
         
         <div class="controls">
             <button class="btn-add-person" onclick="addPerson()">+ Add Person</button>
@@ -821,7 +831,7 @@
             </div>
         </div>
         
-        <div class="extras">
+        <div class="extras" id="extrasBar">
             <div class="extra-field">
                 <label>💵 Tax ($)</label>
                 <input type="number" id="taxAmount" placeholder="0.00" step="0.01" value="0" oninput="updateAllPersonTotals(); renderSummary();">
@@ -851,14 +861,25 @@
         
         <!-- Shared Tab Content -->
         <div class="tab-content" id="sharedTab" data-section="shared">
+            <h2 class="section-header">🍽️ Shared</h2>
             <div class="people-grid shared-only-grid" id="sharedGrid" data-grid="shared"></div>
         </div>
         
         <!-- Summary Tab Content -->
         <div class="tab-content" id="summaryTab" data-section="summary">
+            <div class="extras" id="extrasBarMobile" style="display:none;"></div>
             <div class="summary" id="summary"></div>
         </div>
     </div>
+    
+    <!-- FAB for mobile -->
+        <button class="fab" onclick="quickAdd()" title="Quick Add">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
+                <circle cx="20" cy="20" r="20" fill="#4CAF50"/>
+                <rect x="18" y="10" width="4" height="20" rx="2" fill="white"/>
+                <rect x="10" y="18" width="20" height="4" rx="2" fill="white"/>
+            </svg>
+        </button>
     
     <!-- Bottom bar for mobile -->
     <div class="bottom-bar">
@@ -867,14 +888,29 @@
                 <div class="bottom-bar-label">Total Bill</div>
                 <div class="bottom-bar-amount" id="bottomBarTotal">$0.00</div>
             </div>
-            <div class="bottom-bar-actions">
-                <button class="bottom-bar-button" id="bottomBarAddBtn" onclick="quickAdd()">+ Add</button>
-                <button class="bottom-bar-button secondary" onclick="exportImage()">📸 Export Summary</button>
-            </div>
+            <button class="bottom-bar-button" onclick="exportImage()">📸 Export</button>
         </div>
     </div>
     
     <script>
+        // Move extras to summary tab on mobile
+        function moveExtrasForMobile() {
+            const extrasBar = document.getElementById('extrasBar');
+            const extrasBarMobile = document.getElementById('extrasBarMobile');
+            if (window.innerWidth <= 768) {
+                if (extrasBar && extrasBarMobile && !extrasBarMobile.hasChildNodes()) {
+                    extrasBarMobile.appendChild(extrasBar);
+                    extrasBarMobile.style.display = 'block';
+                }
+            } else {
+                if (extrasBarMobile && extrasBarMobile.hasChildNodes()) {
+                    document.querySelector('.container').insertBefore(extrasBar, document.getElementById('peopleTab'));
+                    extrasBarMobile.style.display = 'none';
+                }
+            }
+        }
+        window.addEventListener('resize', moveExtrasForMobile);
+        window.addEventListener('DOMContentLoaded', moveExtrasForMobile);
         let people = [];
         let sharedItems = [];
         let nextPersonId = 1;
@@ -1116,31 +1152,7 @@
             }
         }
         
-        function updateAllPersonTotals() {
-            const { totals } = calculateTotals();
-            
-            totals.forEach(personData => {
-                const personColumn = document.querySelector(`[data-person-id="${personData.id}"]`);
-                if (personColumn) {
-                    const totalDiv = personColumn.querySelector('.person-total');
-                    if (totalDiv) {
-                        totalDiv.innerHTML = `
-                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                                Items: $${personData.subtotal.toFixed(2)}<br>
-                                ${personData.sharedSubtotal > 0 ? `Shared: $${personData.sharedSubtotal.toFixed(2)}<br>` : ''}
-                                Tax: $${personData.tax.toFixed(2)}<br>
-                                Tip: $${personData.tip.toFixed(2)}
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700;">
-                                Total: $${personData.total.toFixed(2)}
-                            </div>
-                        `;
-                    }
-                }
-            });
-            
-            updateStats();
-        }
+
         
         function render() {
             // Clear all grids first to prevent any stale content
@@ -1176,15 +1188,18 @@
                 
                 return `
                     <div class="person-column" data-person-id="${person.id}">
-                        <div class="person-header">
+                        <div class="person-header" style="margin-bottom: 15px; justify-content: space-between; align-items: center; display: flex;">
+                            <h3 id="person-header-${person.id}" style="flex: 1; margin: 0; color: #2196F3; font-size: 18px; font-weight: 700;">👤 ${person.name}</h3>
+                            <button class="btn-remove-person" style="margin-left: 10px; min-width: 36px; min-height: 36px; font-size: 22px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="removePerson(${person.id})">×</button>
+                        </div>
+                        <div style="margin-bottom: 10px;">
                             <input 
                                 type="text" 
-                                placeholder="Person name" 
                                 value="${person.name}"
-                                onblur="updatePersonName(${person.id}, this.value)"
+                                onblur="updatePersonName(${person.id}, this.value); document.getElementById('person-header-${person.id}').textContent = '👤 ' + this.value;"
                                 onkeypress="if(event.key === 'Enter') { this.blur(); }"
+                                style="width: 100%;"
                             />
-                            <button class="btn-remove-person" onclick="removePerson(${person.id})">×</button>
                         </div>
                         
                         <div class="items-list">
@@ -1209,20 +1224,7 @@
                                 </div>
                             `).join('')}
                         </div>
-                        
                         <button class="btn-add-item" onclick="addItem(${person.id})">+ Add Item</button>
-                        
-                        <div class="person-total">
-                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
-                                Items: ${personData.subtotal.toFixed(2)}<br>
-                                ${personData.sharedSubtotal > 0 ? `Shared: ${personData.sharedSubtotal.toFixed(2)}<br>` : ''}
-                                Tax: ${personData.tax.toFixed(2)}<br>
-                                Tip: ${personData.tip.toFixed(2)}
-                            </div>
-                            <div style="font-size: 16px; font-weight: 700;">
-                                Total: ${personData.total.toFixed(2)}
-                            </div>
-                        </div>
                     </div>
                 `;
             }).join('');
@@ -1404,11 +1406,7 @@
         addPerson();
         addPerson();
         
-        // Initialize bottom bar button
-        const addBtn = document.getElementById('bottomBarAddBtn');
-        if (addBtn) {
-            addBtn.textContent = '+ Add Person';
-        }
+
     </script>
 </body>
 </html>
