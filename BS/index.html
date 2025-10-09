@@ -709,6 +709,11 @@
         .fab:active {
             transform: scale(0.95);
         }
+
+        /* Ensure FAB resets after click */
+        .fab.reset {
+            transform: none !important;
+        }
         
         .bottom-bar {
             position: fixed;
@@ -947,6 +952,14 @@
         }
         
         function quickAdd() {
+            const fabBtn = document.querySelector('.fab');
+            if (fabBtn) {
+                fabBtn.classList.remove('reset');
+                setTimeout(() => {
+                    fabBtn.classList.add('reset');
+                    setTimeout(() => fabBtn.classList.remove('reset'), 200);
+                }, 200);
+            }
             if (currentTab === 'people') {
                 addPerson();
             } else if (currentTab === 'shared') {
