@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bill Splitter</title>
     <style>
         * {
@@ -17,6 +17,8 @@
             padding: 20px;
             padding-bottom: 100px;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         @media (max-width: 768px) {
@@ -29,10 +31,8 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         @media (max-width: 768px) {
@@ -112,6 +112,13 @@
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .tab:active:not(.active) {
+            background: #e0e0e0;
+            transform: scale(0.98);
         }
         
         .tab.active {
@@ -122,6 +129,7 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             padding: 16px 0;
+            transform: scale(1);
         }
         
         .tab-content {
@@ -378,6 +386,7 @@
             border-radius: 8px;
             font-size: 15px;
             transition: border-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         
         input:focus {
@@ -391,6 +400,10 @@
                 padding: 14px;
                 font-size: 16px;
             }
+            
+            input[type="number"] {
+                font-size: 16px;
+            }
         }
         
         button {
@@ -401,6 +414,12 @@
             font-size: 15px;
             font-weight: 600;
             transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        button:active {
+            transform: scale(0.97);
         }
         
         @media (max-width: 768px) {
@@ -517,10 +536,16 @@
             padding: 6px;
             border-radius: 6px;
             transition: background 0.2s;
+            cursor: pointer;
+            min-height: 44px;
         }
         
         .person-checkbox:hover {
             background: #f5f5f5;
+        }
+        
+        .person-checkbox:active {
+            background: #ebebeb;
         }
         
         .person-checkbox input[type="checkbox"] {
@@ -528,6 +553,7 @@
             height: 22px;
             cursor: pointer;
             accent-color: #ff9800;
+            flex-shrink: 0;
         }
         
         @media (max-width: 768px) {
@@ -537,7 +563,7 @@
             }
         }
         
-        .person-checkbox label {
+        .person-checkbox span {
             cursor: pointer;
             font-size: 14px;
             flex: 1;
@@ -702,17 +728,19 @@
             }
         }
         
-        .fab:hover {
-              transform: scale(1.13) rotate(-8deg);
+        .fab:active {
+            transform: scale(0.95) rotate(0deg);
+            transition: transform 0.1s;
         }
         
-        .fab:active {
-            transform: scale(0.95);
+        @keyframes fabPulse {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(90deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
-
-        /* Ensure FAB resets after click */
-        .fab.reset {
-            transform: none !important;
+        
+        .fab.animate {
+            animation: fabPulse 0.3s ease-in-out;
         }
         
         .bottom-bar {
@@ -881,13 +909,13 @@
     </div>
     
     <!-- FAB for mobile -->
-        <button class="fab" onclick="quickAdd()" title="Quick Add">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
-                <circle cx="20" cy="20" r="20" fill="#4CAF50"/>
-                <rect x="18" y="10" width="4" height="20" rx="2" fill="white"/>
-                <rect x="10" y="18" width="20" height="4" rx="2" fill="white"/>
-            </svg>
-        </button>
+    <button class="fab" onclick="quickAdd()" title="Quick Add">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto;">
+            <circle cx="20" cy="20" r="20" fill="#4CAF50"/>
+            <rect x="18" y="10" width="4" height="20" rx="2" fill="white"/>
+            <rect x="10" y="18" width="20" height="4" rx="2" fill="white"/>
+        </svg>
+    </button>
     
     <!-- Bottom bar for mobile -->
     <div class="bottom-bar">
@@ -901,7 +929,6 @@
     </div>
     
     <script>
-        // Move extras to summary tab on mobile
         function moveExtrasForMobile() {
             const extrasBar = document.getElementById('extrasBar');
             const extrasBarMobile = document.getElementById('extrasBarMobile');
@@ -919,6 +946,7 @@
         }
         window.addEventListener('resize', moveExtrasForMobile);
         window.addEventListener('DOMContentLoaded', moveExtrasForMobile);
+        
         let people = [];
         let sharedItems = [];
         let nextPersonId = 1;
@@ -936,30 +964,22 @@
             if (tab === 'people') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('peopleTab').classList.add('active');
-                addBtn.textContent = '+ Add Person 👥';
             } else if (tab === 'shared') {
                 document.querySelectorAll('.tab')[1].classList.add('active');
                 document.getElementById('sharedTab').classList.add('active');
-                addBtn.textContent = '+ Add Shared 🍽️';
             } else if (tab === 'summary') {
                 document.querySelectorAll('.tab')[2].classList.add('active');
                 document.getElementById('summaryTab').classList.add('active');
-                addBtn.style.display = 'none';
-                return;
             }
-            
-            addBtn.style.display = 'block';
         }
         
         function quickAdd() {
             const fabBtn = document.querySelector('.fab');
             if (fabBtn) {
-                fabBtn.classList.remove('reset');
-                setTimeout(() => {
-                    fabBtn.classList.add('reset');
-                    setTimeout(() => fabBtn.classList.remove('reset'), 200);
-                }, 200);
+                fabBtn.classList.add('animate');
+                setTimeout(() => fabBtn.classList.remove('animate'), 300);
             }
+            
             if (currentTab === 'people') {
                 addPerson();
             } else if (currentTab === 'shared') {
@@ -976,13 +996,27 @@
         }
         
         function addPerson() {
+            const newId = nextPersonId;
             people.push({
-                id: nextPersonId,
-                name: `Person ${nextPersonId}`,
+                id: newId,
+                name: `Person ${newId}`,
                 items: []
             });
             nextPersonId++;
             render();
+            
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const newPerson = document.querySelector(`[data-person-id="${newId}"]`);
+                    if (newPerson) {
+                        newPerson.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const nameInput = newPerson.querySelector('input[type="text"]');
+                        if (nameInput) {
+                            setTimeout(() => nameInput.focus(), 300);
+                        }
+                    }
+                }, 100);
+            }
         }
         
         function removePerson(personId) {
@@ -1006,8 +1040,7 @@
             const person = people.find(p => p.id === personId);
             if (person) {
                 person.name = name;
-                renderSummary();
-                updateStats();
+                render();
             }
         }
         
@@ -1024,13 +1057,24 @@
         }
         
         function addSharedItem() {
+            const newId = nextItemId++;
             sharedItems.push({
-                id: nextItemId++,
+                id: newId,
                 name: '',
                 price: 0,
                 sharedWith: people.map(p => p.id)
             });
             render();
+            
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const sharedColumns = document.querySelectorAll('.shared-column');
+                    const newItem = sharedColumns[sharedColumns.length - 1];
+                    if (newItem) {
+                        newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+            }
         }
         
         function removeItem(personId, itemId) {
@@ -1064,12 +1108,11 @@
             if (item) {
                 item[field] = field === 'price' ? parseFloat(value) || 0 : value;
                 
-                // Show warning if no one is selected
                 if (field === 'price' && item.sharedWith.length === 0 && item.price > 0) {
                     alert('⚠️ This shared item has no people selected!');
                 }
                 
-                render(); // Full render to update per-person amounts
+                render();
             }
         }
         
@@ -1082,7 +1125,7 @@
                 } else {
                     item.sharedWith.push(personId);
                 }
-                render(); // Full render to update per-person amounts
+                render();
             }
         }
         
@@ -1195,13 +1238,11 @@
         }
         
         function render() {
-            // Clear all grids first to prevent any stale content
             const peopleGridEl = document.getElementById('peopleGrid');
             const sharedGridEl = document.getElementById('sharedGrid');
             if (peopleGridEl) peopleGridEl.innerHTML = '';
             if (sharedGridEl) sharedGridEl.innerHTML = '';
             
-            // Now render fresh content
             renderPeopleGrid();
             renderSharedGrid();
             renderSummary();
@@ -1222,7 +1263,6 @@
                 return;
             }
             
-            // Only render people columns; shared items are shown in the shared tab/grid
             grid.innerHTML = people.map(person => {
                 const personData = totals.find(t => t.id === person.id);
                 
@@ -1235,7 +1275,7 @@
                         <div style="margin-bottom: 10px;">
                             <input 
                                 type="text" 
-                                placeholder="Person name" 
+                                placeholder="Name" 
                                 value="${person.name}"
                                 onblur="updatePersonName(${person.id}, this.value)"
                                 onkeypress="if(event.key === 'Enter') { this.blur(); }"
@@ -1267,8 +1307,6 @@
                         </div>
                         
                         <button class="btn-add-item" onclick="addItem(${person.id})">+ Add Item</button>
-                        
-                        <!-- Per-person breakdown hidden for cleaner UI -->
                     </div>
                 `;
             }).join('');
@@ -1287,7 +1325,6 @@
                 return;
             }
             
-            // On mobile, show each shared item as its own card
             grid.innerHTML = sharedItems.map(item => `
                 <div class="person-column shared-column">
                     <div class="person-header" style="margin-bottom: 15px; justify-content: space-between; align-items: center; display: flex;">
@@ -1317,25 +1354,25 @@
                     
                     <div class="shared-with">
                         <div class="shared-with-header">Shared with:</div>
-                        <div class="person-checkbox select-all">
+                        <label class="person-checkbox select-all">
                             <input 
                                 type="checkbox" 
                                 id="all-${item.id}"
                                 ${item.sharedWith.length === people.length ? 'checked' : ''}
                                 onchange="toggleSharedWithAll(${item.id})"
                             />
-                            <label for="all-${item.id}">All</label>
-                        </div>
+                            <span>All</span>
+                        </label>
                         ${people.map(p => `
-                            <div class="person-checkbox">
+                            <label class="person-checkbox">
                                 <input 
                                     type="checkbox" 
                                     id="share-${item.id}-${p.id}"
                                     ${item.sharedWith.includes(p.id) ? 'checked' : ''}
                                     onchange="toggleSharedWith(${item.id}, ${p.id})"
                                 />
-                                <label for="share-${item.id}-${p.id}">${p.name}</label>
-                            </div>
+                                <span>${p.name}</span>
+                            </label>
                         `).join('')}
                     </div>
                     
@@ -1426,6 +1463,12 @@
                 return;
             }
             
+            const exportBtns = document.querySelectorAll('.btn-export, .bottom-bar-button');
+            exportBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.textContent = btn.classList.contains('bottom-bar-button') ? '⏳ Exporting...' : '⏳ Exporting...';
+            });
+            
             try {
                 const canvas = await html2canvas(element, {
                     backgroundColor: '#f0f0f0',
@@ -1439,22 +1482,30 @@
                     a.download = 'bill-split-' + new Date().getTime() + '.png';
                     a.click();
                     URL.revokeObjectURL(url);
+                    
+                    exportBtns.forEach(btn => {
+                        btn.disabled = false;
+                        btn.textContent = btn.classList.contains('bottom-bar-button') ? '📸 Export' : '📸 Export Summary';
+                    });
                 });
             } catch (error) {
                 console.error('Export failed:', error);
                 alert('Failed to export image. Please try again.');
+                
+                exportBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.textContent = btn.classList.contains('bottom-bar-button') ? '📸 Export' : '📸 Export Summary';
+                });
             }
         }
         
-        // Initialize
         addPerson();
         addPerson();
         
-        // Initialize bottom bar button
-        const addBtn = document.getElementById('bottomBarAddBtn');
-        if (addBtn) {
-            addBtn.textContent = '+ Add Person';
-        }
+        document.getElementById('taxAmount').value = 0;
+        document.getElementById('tipAmount').value = 0;
+        document.getElementById('bottomBarTotal').textContent = "$0.00";
+        document.getElementById('totalAmount').textContent = "$0.00";
     </script>
 </body>
 </html>
