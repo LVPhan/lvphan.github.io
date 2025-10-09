@@ -314,6 +314,10 @@
             margin-bottom: 15px;
         }
         
+        .person-header input {
+            flex: 1;
+        }
+        
         .btn-remove-person {
             background: #ff4444;
             color: white;
@@ -861,7 +865,6 @@
         
         <!-- Shared Tab Content -->
         <div class="tab-content" id="sharedTab" data-section="shared">
-            <h2 class="section-header">🍽️ Shared</h2>
             <div class="people-grid shared-only-grid" id="sharedGrid" data-grid="shared"></div>
         </div>
         
@@ -1152,7 +1155,31 @@
             }
         }
         
-
+        function updateAllPersonTotals() {
+            const { totals } = calculateTotals();
+            
+            totals.forEach(personData => {
+                const personColumn = document.querySelector(`[data-person-id="${personData.id}"]`);
+                if (personColumn) {
+                    const totalDiv = personColumn.querySelector('.person-total');
+                    if (totalDiv) {
+                        totalDiv.innerHTML = `
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
+                                Items: $${personData.subtotal.toFixed(2)}<br>
+                                ${personData.sharedSubtotal > 0 ? `Shared: $${personData.sharedSubtotal.toFixed(2)}<br>` : ''}
+                                Tax: $${personData.tax.toFixed(2)}<br>
+                                Tip: $${personData.tip.toFixed(2)}
+                            </div>
+                            <div style="font-size: 16px; font-weight: 700;">
+                                Total: $${personData.total.toFixed(2)}
+                            </div>
+                        `;
+                    }
+                }
+            });
+            
+            updateStats();
+        }
         
         function render() {
             // Clear all grids first to prevent any stale content
@@ -1189,14 +1216,15 @@
                 return `
                     <div class="person-column" data-person-id="${person.id}">
                         <div class="person-header" style="margin-bottom: 15px; justify-content: space-between; align-items: center; display: flex;">
-                            <h3 id="person-header-${person.id}" style="flex: 1; margin: 0; color: #2196F3; font-size: 18px; font-weight: 700;">👤 ${person.name}</h3>
+                            <h3 style="flex: 1; margin: 0; color: #2196F3; font-size: 18px; font-weight: 700;">👤 ${person.name}</h3>
                             <button class="btn-remove-person" style="margin-left: 10px; min-width: 36px; min-height: 36px; font-size: 22px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="removePerson(${person.id})">×</button>
                         </div>
                         <div style="margin-bottom: 10px;">
                             <input 
                                 type="text" 
+                                placeholder="Person name" 
                                 value="${person.name}"
-                                onblur="updatePersonName(${person.id}, this.value); document.getElementById('person-header-${person.id}').textContent = '👤 ' + this.value;"
+                                onblur="updatePersonName(${person.id}, this.value)"
                                 onkeypress="if(event.key === 'Enter') { this.blur(); }"
                                 style="width: 100%;"
                             />
@@ -1224,7 +1252,10 @@
                                 </div>
                             `).join('')}
                         </div>
+                        
                         <button class="btn-add-item" onclick="addItem(${person.id})">+ Add Item</button>
+                        
+                        <!-- Per-person breakdown hidden for cleaner UI -->
                     </div>
                 `;
             }).join('');
@@ -1406,7 +1437,11 @@
         addPerson();
         addPerson();
         
-
+        // Initialize bottom bar button
+        const addBtn = document.getElementById('bottomBarAddBtn');
+        if (addBtn) {
+            addBtn.textContent = '+ Add Person';
+        }
     </script>
 </body>
 </html>
